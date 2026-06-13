@@ -158,7 +158,7 @@ export default function HistoryTable({
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
-                      {b.serviceName || "Lớp tập Gym"}
+                      {b.serviceName || "Không"}
                     </td>
                     <td
                       className={`py-4 px-4 text-neutral-mutedforeground transition-colors ${

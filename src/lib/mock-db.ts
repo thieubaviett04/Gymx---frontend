@@ -194,7 +194,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-28",
     status: "ATTENDED" // Chưa đánh giá & Còn hạn
@@ -204,7 +204,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-25",
     status: "ATTENDED", // Đã đánh giá & Còn hạn
@@ -217,7 +217,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-20",
     status: "ATTENDED", // Đã đánh giá & Quá hạn
@@ -230,7 +230,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-18",
     status: "ATTENDED", // Đã đánh giá & Quá hạn
@@ -243,7 +243,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Không",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-15",
     status: "MISSED" // Vắng mặt
@@ -253,7 +253,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-12",
     status: "ATTENDED", // Đã đánh giá & Quá hạn
@@ -266,7 +266,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-08",
     status: "ATTENDED", // Đã sửa & Quá hạn
@@ -280,7 +280,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Không",
     timeSlot: "09:30 - 10:30",
     date: "2026-05-06",
     status: "MISSED" // Vắng mặt
@@ -290,7 +290,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "09:00 - 10:00",
     date: "2026-05-27",
     status: "ATTENDED" // Chưa đánh giá & Còn hạn
@@ -300,7 +300,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-23",
     status: "ATTENDED", // Đã sửa & Còn hạn
@@ -314,7 +314,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-22",
     status: "ATTENDED", // Đã đánh giá & Còn hạn
@@ -327,7 +327,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-24",
     status: "CANCELLED" // Đã hủy
@@ -337,7 +337,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Không",
     timeSlot: "09:30 - 10:30",
     date: "2026-05-21",
     status: "MISSED" // Vắng mặt
@@ -347,7 +347,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-19",
     status: "ATTENDED" // Chưa đánh giá & Quá hạn
@@ -357,7 +357,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-17",
     status: "ATTENDED" // Chưa đánh giá & Quá hạn
@@ -367,7 +367,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-14",
     status: "ATTENDED", // Đã đánh giá & Quá hạn
@@ -380,7 +380,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-10",
     status: "CANCELLED" // Đã hủy
@@ -390,7 +390,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-05",
     status: "ATTENDED" // Chưa đánh giá & Quá hạn
@@ -400,7 +400,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-03",
     status: "ATTENDED", // Đã đánh giá & Quá hạn
@@ -413,7 +413,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-05-02",
     status: "ATTENDED" // Chưa đánh giá & Quá hạn
@@ -424,7 +424,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-06-01",
     status: "ATTENDED" // Chưa đánh giá & Còn hạn
@@ -434,7 +434,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Gói cơ bản",
     timeSlot: "09:00 - 10:00",
     date: "2026-06-05",
     status: "ATTENDED", // Đã đánh giá & Còn hạn
@@ -447,7 +447,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ cơ bản",
+    serviceName: "Không",
     timeSlot: "08:00 - 09:00",
     date: "2026-06-10",
     status: "MISSED" // Vắng mặt
@@ -457,7 +457,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT002",
     ptName: "Lê Thị B",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Không",
     timeSlot: "08:00 - 09:00",
     date: "2026-06-12",
     status: "CANCELLED" // Đã hủy
@@ -467,7 +467,7 @@ const INITIAL_BOOKINGS: Booking[] = [
     userId: "M001",
     ptId: "PT001",
     ptName: "Nguyễn Văn A",
-    serviceName: "Tăng cơ chuyên sâu",
+    serviceName: "Gói nâng cao",
     timeSlot: "08:00 - 09:00",
     date: "2026-06-15",
     status: "ATTENDED" // Chưa đánh giá & Còn hạn
@@ -610,7 +610,7 @@ export const GymDB = {
   getUsers: () => getStore<User[]>('gym_users', INITIAL_USERS),
   getMemberships: () => getStore<Membership[]>('gym_memberships', INITIAL_MEMBERSHIPS),
   getPTs: () => getStore<PT[]>('gym_pts', INITIAL_PTS),
-  getBookings: () => getStore<Booking[]>('gym_bookings_v3', INITIAL_BOOKINGS),
+  getBookings: () => getStore<Booking[]>('gym_bookings_v4', INITIAL_BOOKINGS),
   getPayments: () => getStore<Payment[]>('gym_payments', INITIAL_PAYMENTS),
   getCheckIns: () => getStore<CheckIn[]>('gym_checkins', INITIAL_CHECKINS),
   getDailyPasses: () => getStore<DailyPass[]>('gym_dailypasses', INITIAL_DAILY_PASSES),
@@ -619,7 +619,7 @@ export const GymDB = {
   // Lưu dữ liệu
   setUsers: (users: User[]) => setStore('gym_users', users),
   setMemberships: (memberships: Membership[]) => setStore('gym_memberships', memberships),
-  setBookings: (bookings: Booking[]) => setStore('gym_bookings_v3', bookings),
+  setBookings: (bookings: Booking[]) => setStore('gym_bookings_v4', bookings),
   setPayments: (payments: Payment[]) => setStore('gym_payments', payments),
   setCheckIns: (checkins: CheckIn[]) => setStore('gym_checkins', checkins),
   setDailyPasses: (passes: DailyPass[]) => setStore('gym_dailypasses', passes),

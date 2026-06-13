@@ -120,7 +120,7 @@ export default function DetailsPanel({
                   Dịch vụ
                 </label>
                 <div className="w-full bg-neutral-muted/50 border border-neutral-border rounded-lg py-2.5 px-3.5 text-xs text-neutral-foreground font-semibold select-none pointer-events-none">
-                  {selectedBooking.serviceName || "Lớp tập Gym"}
+                  {selectedBooking.serviceName || "Không"}
                 </div>
               </div>
 
