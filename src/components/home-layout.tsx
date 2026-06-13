@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   Bell,
   CalendarDays,
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 interface HomeLayoutProps {
   children: React.ReactNode;
   pageTitle?: string;
+  pageSubtitle?: string;
 }
 
 type MenuSubItem = {
@@ -49,8 +50,9 @@ const featureUnavailable = (name: string) => {
   alert(`${name} sẽ được cập nhật sau!`);
 };
 
-export function HomeLayout({ children, pageTitle }: HomeLayoutProps) {
+export function HomeLayout({ children, pageTitle, pageSubtitle }: HomeLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isRegisterDropdownOpen, setIsRegisterDropdownOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -97,7 +99,7 @@ export function HomeLayout({ children, pageTitle }: HomeLayoutProps) {
       id: "history-workout",
       label: "Lịch sử tập",
       icon: Clock3,
-      onClick: () => featureUnavailable("Lịch sử tập"),
+      onClick: () => router.push("/history"),
     },
     {
       id: "history-payment",
@@ -111,7 +113,12 @@ export function HomeLayout({ children, pageTitle }: HomeLayoutProps) {
     <nav className="flex-1 space-y-5 overflow-y-auto px-4 py-6">
       {menuItems.map((item) => {
         const Icon = item.icon;
-        const isActive = item.id === "home";
+        const isActive =
+          item.id === "home"
+            ? pathname === "/"
+            : item.id === "history-workout"
+            ? pathname === "/history"
+            : false;
 
         if (item.hasSubmenu) {
           return (
@@ -232,7 +239,7 @@ export function HomeLayout({ children, pageTitle }: HomeLayoutProps) {
                   {pageTitle || "Xin chào Hội viên!"}
                 </h1>
                 <p className="truncate text-sm text-neutral-300">
-                  Chọn một thao tác bên dưới để bắt đầu.
+                  {pageSubtitle || "Chọn một thao tác bên dưới để bắt đầu."}
                 </p>
               </div>
             </div>
