@@ -46,6 +46,17 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Custom Gym-X Theme Colors */
+  --color-status-success: var(--status-success);
+  --color-status-warning: var(--status-warning);
+  --color-status-danger: var(--status-danger);
+  
+  --color-neutral-background: var(--neutral-background);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-neutral-muted: var(--neutral-muted);
+  --color-neutral-mutedforeground: var(--neutral-mutedforeground);
+  --color-neutral-border: var(--neutral-border);
 }
 
 :root {
@@ -79,6 +90,17 @@
   --sidebar-accent-foreground: #FF6B00;
   --sidebar-border: #E5E5E5;
   --sidebar-ring: #FF6B00;
+
+  /* Custom Gym-X Root Colors */
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+  
+  --neutral-background: #ffffff;
+  --neutral-foreground: #0a0a0a;
+  --neutral-muted: #f5f5f5;
+  --neutral-mutedforeground: #525252;
+  --neutral-border: #e5e5e5;
 }
 
 .dark {
@@ -109,6 +131,11 @@
   --sidebar-accent-foreground: #FF6B00;
   --sidebar-border: #262626;
   --sidebar-ring: #FF6B00;
+
+  /* Custom Gym-X Dark Colors */
+  --status-success: #22c55e;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
 }
 
 @layer base {
