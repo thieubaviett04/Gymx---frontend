@@ -18,8 +18,9 @@ import { cn } from "@/lib/utils";
 
 interface HomeLayoutProps {
   children: React.ReactNode;
-  pageTitle?: string;
-  pageSubtitle?: string;
+  pageTitle?: React.ReactNode;
+  pageSubtitle?: React.ReactNode;
+  pageIcon?: React.ReactNode;
 }
 
 type MenuSubItem = {
@@ -50,7 +51,7 @@ const featureUnavailable = (name: string) => {
   alert(`${name} sẽ được cập nhật sau!`);
 };
 
-export function HomeLayout({ children, pageTitle, pageSubtitle }: HomeLayoutProps) {
+export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: HomeLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isRegisterDropdownOpen, setIsRegisterDropdownOpen] = useState(true);
@@ -87,7 +88,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle }: HomeLayoutProp
       id: "register-pt",
       label: "Đăng ký huấn luyện viên",
       icon: Dumbbell,
-      onClick: () => featureUnavailable("Đăng ký huấn luyện viên"),
+      onClick: () => router.push("/register-pt"),
     },
     {
       id: "schedule",
@@ -118,6 +119,8 @@ export function HomeLayout({ children, pageTitle, pageSubtitle }: HomeLayoutProp
             ? pathname === "/"
             : item.id === "history-workout"
             ? pathname === "/history"
+            : item.id === "register-pt"
+            ? pathname === "/register-pt"
             : false;
 
         if (item.hasSubmenu) {
@@ -229,18 +232,31 @@ export function HomeLayout({ children, pageTitle, pageSubtitle }: HomeLayoutProp
             <div className="flex min-w-0 items-center gap-3">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10 md:hidden"
+                className="cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10"
                 aria-label="Mở menu"
               >
-                <Menu className="h-6 w-6" />
+                <svg
+                  className="h-6 w-6"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <line x1="4" x2="12" y1="6" y2="6" />
+                  <line x1="4" x2="20" y1="12" y2="12" />
+                  <line x1="4" x2="20" y1="18" y2="18" />
+                </svg>
               </button>
               <div className="min-w-0 space-y-0.5 text-white">
-                <h1 className="truncate text-xl font-bold leading-7">
+                <h4 className="truncate text-xl font-semibold leading-7">
                   {pageTitle || "Xin chào Hội viên!"}
-                </h1>
-                <p className="truncate text-sm text-neutral-300">
-                  {pageSubtitle || "Chọn một thao tác bên dưới để bắt đầu."}
-                </p>
+                </h4>
+                {((!pageTitle && !pageSubtitle) || pageSubtitle) && (
+                  <div className="truncate text-sm text-neutral-300">
+                    {pageSubtitle || "Chọn một thao tác bên dưới để bắt đầu."}
+                  </div>
+                )}
               </div>
             </div>
 

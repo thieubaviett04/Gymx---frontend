@@ -1,7 +1,7 @@
 "use client";
 
 import { HomeLayout } from "@/components/home-layout";
-import { Bookmark, CalendarDays, Dumbbell, FileText, Clock3, ReceiptText } from "lucide-react";
+import { Bookmark, CalendarDays, Dumbbell, FileText, Clock3, ReceiptText, LayoutGrid } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const featureUnavailable = (name: string) => {
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
 
           <div
-            onClick={() => featureUnavailable("Đăng ký huấn luyện viên")}
+            onClick={() => router.push("/register-pt")}
             className="group flex h-48 cursor-pointer flex-col justify-between rounded-2xl border border-neutral-100 bg-white p-6 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-[#FFB800] transition-transform duration-300 group-hover:scale-105">
