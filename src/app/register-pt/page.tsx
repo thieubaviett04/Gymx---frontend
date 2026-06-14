@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { HomeLayout } from "@/components/home-layout";
 import { useRouter } from "next/navigation";
@@ -356,6 +357,11 @@ export default function RegisterPTPage() {
   const [step, setStep] = useState<"list" | "form">("list");
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
   const [showCancelAlert, setShowCancelAlert] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Drawer / Modal states
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
@@ -466,7 +472,7 @@ export default function RegisterPTPage() {
         });
 
       return matchSearch && matchGender && matchRating && matchSpecialty;
-    });
+    }).sort((a, b) => b.rating - a.rating);
   }, [searchQuery, selectedGender, selectedRating, selectedCategories]);
 
   // Paginated trainers
@@ -608,7 +614,7 @@ export default function RegisterPTPage() {
         )
       }
     >
-      {showCancelAlert && (
+      {mounted && showCancelAlert && createPortal(
         <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-red-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EF4444] text-white shadow-xs">
             <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[#EF4444]">
@@ -624,7 +630,8 @@ export default function RegisterPTPage() {
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div className="w-full animate-in fade-in duration-300">
@@ -751,6 +758,34 @@ export default function RegisterPTPage() {
                         <div className="space-y-3">
                           <span className="block text-sm font-bold text-neutral-800">Chuyên môn</span>
                           <div className="grid grid-cols-2 gap-3">
+                            <label
+                              className="flex items-center justify-between bg-white border border-neutral-200 p-2.5 rounded-lg text-xs text-neutral-700 cursor-pointer font-medium hover:border-neutral-300 transition select-none"
+                            >
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={tempCategories.length === 0}
+                                  onChange={() => {
+                                    setTempCategories([]);
+                                  }}
+                                  className="sr-only"
+                                />
+                                <div
+                                  className={cn(
+                                    "w-4 h-4 rounded border flex items-center justify-center transition",
+                                    tempCategories.length === 0
+                                      ? "border-[#FF6B00] bg-[#FF6B00]/10"
+                                      : "border-neutral-300"
+                                  )}
+                                >
+                                  {tempCategories.length === 0 && (
+                                    <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
+                                  )}
+                                </div>
+                                <span>Tất cả</span>
+                              </div>
+                            </label>
+
                             {["Gym tổng hợp", "Tăng cơ", "Giảm cân", "Cardio"].map((cat) => {
                               const isChecked = tempCategories.includes(cat);
                               return (
@@ -1468,8 +1503,8 @@ export default function RegisterPTPage() {
         )}
 
         {/* DRAWER: TRAINER DETAIL MODAL-DRAWER SLIDING IN FROM RIGHT */}
-        {isDetailDrawerOpen && selectedTrainer && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
+        {mounted && isDetailDrawerOpen && selectedTrainer && createPortal(
+          <div className="fixed inset-0 z-55 overflow-hidden">
             {/* Backdrop overlay with fade */}
             <div
               onClick={() => setIsDetailDrawerOpen(false)}
@@ -1592,7 +1627,7 @@ export default function RegisterPTPage() {
                 <div className="flex-none border-t border-neutral-100 bg-white p-6 space-y-4">
                   <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-xs text-neutral-500">Giá dịch vụ</p>
+                      <p className="text-xs text-neutral-505">Giá dịch vụ</p>
                       <p className="text-xl font-extrabold text-neutral-900 mt-0.5">
                         {formatMoney(selectedTrainer.price)}
                         <span className="text-xs font-normal text-neutral-500">/ giờ</span>
@@ -1612,12 +1647,13 @@ export default function RegisterPTPage() {
 
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* MODAL: CONFIRM BOOKING */}
-        {isConfirmModalOpen && selectedTrainer && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {mounted && isConfirmModalOpen && selectedTrainer && createPortal(
+          <div className="fixed inset-0 z-55 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
               onClick={() => setIsConfirmModalOpen(false)}
@@ -1638,7 +1674,7 @@ export default function RegisterPTPage() {
               {/* Title & icon */}
               <div className="space-y-1 pr-6">
                 <h3 className="text-lg font-bold text-neutral-900">Xác nhận đặt lịch</h3>
-                <p className="text-xs text-neutral-500">Kiểm tra lại thông tin trước khi hoàn tất đăng ký</p>
+                <p className="text-xs text-neutral-505">Kiểm tra lại thông tin trước khi hoàn tất đăng ký</p>
               </div>
 
               {/* Booking Summary Box */}
@@ -1658,7 +1694,7 @@ export default function RegisterPTPage() {
                   <span className="font-semibold text-neutral-800">{selectedTimeSlot}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-neutral-550">Thời lượng</span>
+                  <span className="text-neutral-555">Thời lượng</span>
                   <span className="font-semibold text-neutral-800">{bookingDuration}</span>
                 </div>
                 <div className="flex justify-between">
@@ -1694,12 +1730,13 @@ export default function RegisterPTPage() {
               </div>
 
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* MODAL: SUCCESS BOOKING */}
-        {isSuccessModalOpen && selectedTrainer && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {mounted && isSuccessModalOpen && selectedTrainer && createPortal(
+          <div className="fixed inset-0 z-55 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
@@ -1713,7 +1750,7 @@ export default function RegisterPTPage() {
 
               {/* Message */}
               <h3 className="mt-6 text-xl font-bold text-neutral-900">Đăng ký thành công!</h3>
-              <p className="mt-2 text-sm text-neutral-500 leading-relaxed font-light">
+              <p className="mt-2 text-sm text-neutral-505 leading-relaxed font-light">
                 Chúc mừng bạn đã đặt lịch tập thành công với huấn luyện viên{" "}
                 <span className="font-bold text-neutral-800">{selectedTrainer.name}</span> vào lúc{" "}
                 <span className="font-semibold text-neutral-800">{selectedTimeSlot}</span> ngày{" "}
@@ -1753,7 +1790,8 @@ export default function RegisterPTPage() {
               </div>
 
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
       </div>
