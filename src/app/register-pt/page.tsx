@@ -7,18 +7,13 @@ import { useRouter } from "next/navigation";
 import {
   Search,
   Star,
-  User,
-  Clock,
-  ArrowLeft,
   Calendar,
+  ChevronLeft,
   ChevronRight,
   Check,
   X,
   ChevronDown,
-  Info,
   SlidersHorizontal,
-  Dumbbell,
-  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -29,6 +24,14 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Define Trainer interface
 interface Trainer {
@@ -274,18 +277,6 @@ const MOCK_TRAINERS: Trainer[] = [
   }
 ];
 
-const SPECIALTIES = [
-  "Tất cả chuyên môn",
-  "Gym tổng hợp",
-  "Pilates",
-  "Calisthenics",
-  "Cardio - Aerobic",
-  "Powerlifting",
-  "Boxing",
-  "Phục hồi",
-  "Yoga"
-];
-
 const TIME_SLOTS = [
   { time: "07:00", available: true },
   { time: "08:00", available: true },
@@ -314,6 +305,50 @@ const SERVICES_OPTIONS = [
   }
 ];
 
+const WEEK_DAYS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+
+const toDateValue = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateDisplay = (dateValue: string) =>
+  dateValue ? dateValue.split("-").reverse().join("/") : "--/--/----";
+
+const formatMonthLabel = (date: Date) =>
+  `Tháng ${date.getMonth() + 1}, ${date.getFullYear()}`;
+
+const getCalendarDays = (monthDate: Date) => {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const startOffset = (firstDay.getDay() + 6) % 7;
+
+  return Array.from({ length: startOffset + daysInMonth }, (_, index) => {
+    if (index < startOffset) return null;
+    return new Date(year, month, index - startOffset + 1);
+  });
+};
+
+const getVisiblePages = (currentPage: number, totalPages: number) => {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 3) {
+    return [1, 2, 3, "...", totalPages];
+  }
+
+  if (currentPage >= totalPages - 2) {
+    return [1, "...", totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+};
+
 export default function RegisterPTPage() {
   const router = useRouter();
 
@@ -325,6 +360,7 @@ export default function RegisterPTPage() {
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successInvoiceCode, setSuccessInvoiceCode] = useState("");
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState("");
@@ -349,6 +385,21 @@ export default function RegisterPTPage() {
   // Pagination states
   const [pageSize, setPageSize] = useState(9);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Calendar states
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 4, 28));
+  const calendarRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setIsCalendarOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Booking Form states
   const [bookingDate, setBookingDate] = useState("2026-05-28"); // default date mimicking mockup 28/05/2026
@@ -409,6 +460,7 @@ export default function RegisterPTPage() {
   }, [filteredTrainers, currentPage, pageSize]);
 
   const totalPages = Math.ceil(filteredTrainers.length / pageSize) || 1;
+  const visiblePages = getVisiblePages(currentPage, totalPages);
 
   // Calculate bill pricing
   const billSummary = useMemo(() => {
@@ -471,6 +523,8 @@ export default function RegisterPTPage() {
   };
 
   const handleBookingSubmit = () => {
+    const invoiceNumber = Math.floor(Math.random() * 90000) + 10000;
+    setSuccessInvoiceCode(`GMX-PT-${invoiceNumber}`);
     setIsConfirmModalOpen(false);
     setIsSuccessModalOpen(true);
   };
@@ -857,63 +911,82 @@ export default function RegisterPTPage() {
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-white/10 pt-6">
                 
                 {/* Page Size Select */}
-                <div className="flex items-center gap-2 text-sm text-neutral-450">
+                <div className="flex items-center gap-2 text-xs text-neutral-200">
                   <span>Hiển thị</span>
-                  <div className="relative">
-                    <select
-                      value={pageSize}
-                      onChange={(e) => {
-                        setPageSize(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
-                      className="appearance-none rounded-lg border border-white/10 bg-neutral-900 py-1.5 pl-3 pr-8 text-xs text-white outline-none focus:border-[#FF6B00]"
-                    >
-                      <option value={6}>06</option>
-                      <option value={9}>09</option>
-                      <option value={12}>12</option>
-                      <option value={15}>15</option>
-                    </select>
-                    <ChevronDown className="absolute right-2.5 top-2.5 h-3.5 w-3.5 pointer-events-none text-neutral-450" />
-                  </div>
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(value) => {
+                      setPageSize(Number(value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-[74px] rounded-md border-0 bg-white px-3 py-0 text-xs font-semibold text-neutral-800 shadow-sm [&_svg]:text-[#FF6B00]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-neutral-200 bg-white shadow-xl">
+                      <SelectItem value="6">06</SelectItem>
+                      <SelectItem value="9">09</SelectItem>
+                      <SelectItem value="12">12</SelectItem>
+                      <SelectItem value="15">15</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <span>trong tổng {filteredTrainers.length} huấn luyện viên</span>
                 </div>
 
-                {/* Page Controls */}
-                <div className="flex items-center gap-1.5">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    className="flex h-9 items-center gap-1 rounded-xl border border-white/10 bg-transparent px-3 text-xs font-semibold text-white transition hover:bg-white/5 disabled:opacity-40 disabled:hover:bg-transparent"
-                  >
-                    &lt; Trước
-                  </button>
+                 {/* Page Controls */}
+                 <div className="flex items-center gap-2">
+                   <Button
+                     type="button"
+                     variant="ghost"
+                     size="sm"
+                     disabled={currentPage === 1}
+                     onClick={() => setCurrentPage(currentPage - 1)}
+                     className="h-7 rounded-md px-1.5 text-[11px] font-medium text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
+                   >
+                     ‹ Trước
+                   </Button>
+ 
+                   {visiblePages.map((page, index) => {
+                     if (page === "...") {
+                       return (
+                         <span key={`ellipsis-${index}`} className="px-1 text-[11px] font-semibold text-white/70">
+                           ...
+                         </span>
+                       );
+                     }
 
-                  {Array.from({ length: totalPages }).map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={cn(
-                          "h-9 w-9 rounded-xl text-xs font-bold transition",
-                          currentPage === pageNum
-                            ? "bg-[#FF6B00] text-white"
-                            : "border border-white/10 text-neutral-300 hover:bg-white/5"
-                        )}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
+                     const pageNum = page as number;
 
-                  <button
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    className="flex h-9 items-center gap-1 rounded-xl border border-white/10 bg-transparent px-3 text-xs font-semibold text-white transition hover:bg-white/5 disabled:opacity-40 disabled:hover:bg-transparent"
-                  >
-                    Tiếp &gt;
-                  </button>
-                </div>
+                     return (
+                       <Button
+                         key={pageNum}
+                         type="button"
+                         variant={currentPage === pageNum ? "default" : "ghost"}
+                         size="icon-sm"
+                         onClick={() => setCurrentPage(pageNum)}
+                         className={cn(
+                           "h-7 w-7 rounded-md text-[11px] font-semibold",
+                           currentPage === pageNum
+                             ? "bg-[#FF6B00] text-white hover:bg-[#FF6B00]/90"
+                             : "bg-transparent text-white hover:bg-white/10 hover:text-white"
+                         )}
+                       >
+                         {pageNum}
+                       </Button>
+                     );
+                   })}
+ 
+                   <Button
+                     type="button"
+                     variant="ghost"
+                     size="sm"
+                     disabled={currentPage === totalPages}
+                     onClick={() => setCurrentPage(currentPage + 1)}
+                     className="h-7 rounded-md px-1.5 text-[11px] font-medium text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
+                   >
+                     Tiếp ›
+                   </Button>
+                 </div>
 
               </div>
             )}
@@ -990,14 +1063,94 @@ export default function RegisterPTPage() {
                         Ngày tập <span className="text-[#FF6B00]">*</span>
                         <span className="text-[10px] text-neutral-450 font-normal ml-1">(Vui lòng chọn ngày bắt đầu từ hôm nay)</span>
                       </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={bookingDate}
-                          onChange={(e) => setBookingDate(e.target.value)}
-                          min="2026-05-01"
-                          className="w-full rounded-xl border border-neutral-200 bg-neutral-50 py-3 px-4 text-sm text-[#3C3C3C] placeholder-neutral-400 outline-none transition focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] focus:bg-white"
-                        />
+                      <div className="relative" ref={calendarRef}>
+                        <button
+                          type="button"
+                          onClick={() => setIsCalendarOpen((open) => !open)}
+                          className="w-full flex items-center justify-between rounded-xl border border-neutral-200 bg-neutral-50 py-3 px-4 text-sm text-neutral-800 outline-none hover:bg-neutral-100/50 hover:border-neutral-300 transition cursor-pointer select-none"
+                        >
+                          <span>{formatDateDisplay(bookingDate)}</span>
+                          <Calendar className="h-4 w-4 text-[#FF6B00]" />
+                        </button>
+
+                        {isCalendarOpen && (
+                          <div className="absolute left-0 top-[calc(100%+8px)] z-60 w-[276px] rounded-lg border border-neutral-200 bg-white p-3 shadow-lg font-sans">
+                            {/* Calendar Header */}
+                            <div className="relative flex items-center justify-center pt-1.5 pb-3">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCalendarMonth(
+                                    (month) => new Date(month.getFullYear(), month.getMonth() - 1, 1),
+                                  )
+                                }
+                                className="absolute left-1 flex h-7 w-7 items-center justify-center rounded-md border border-neutral-200 bg-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition cursor-pointer"
+                              >
+                                <ChevronLeft className="h-4 w-4" />
+                              </button>
+                              <span className="text-sm font-medium text-neutral-850">
+                                {formatMonthLabel(calendarMonth)}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setCalendarMonth(
+                                    (month) => new Date(month.getFullYear(), month.getMonth() + 1, 1),
+                                  )
+                                }
+                                className="absolute right-1 flex h-7 w-7 items-center justify-center rounded-md border border-neutral-200 bg-transparent text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 transition cursor-pointer"
+                              >
+                                <ChevronRight className="h-4 w-4" />
+                              </button>
+                            </div>
+
+                            {/* Weekdays Row */}
+                            <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                              {WEEK_DAYS.map((day) => (
+                                <div key={day} className="h-8 w-8 flex items-center justify-center text-[10px] font-normal text-neutral-400">
+                                  {day}
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Days Grid */}
+                            <div className="grid grid-cols-7 gap-1 text-center">
+                              {getCalendarDays(calendarMonth).map((day, index) => {
+                                if (!day) {
+                                  return <div key={`empty-${index}`} className="h-8 w-8" />;
+                                }
+
+                                const dateValue = toDateValue(day);
+                                const isSelected = dateValue === bookingDate;
+                                const todayDate = new Date();
+                                todayDate.setHours(0, 0, 0, 0);
+                                const isDisabled = day < todayDate;
+
+                                return (
+                                  <button
+                                    key={dateValue}
+                                    type="button"
+                                    disabled={isDisabled}
+                                    onClick={() => {
+                                      setBookingDate(dateValue);
+                                      setCalendarMonth(day);
+                                      setIsCalendarOpen(false);
+                                    }}
+                                    className={cn(
+                                      "h-8 w-8 rounded-md text-xs font-normal transition-colors flex items-center justify-center cursor-pointer",
+                                      isSelected
+                                        ? "bg-[#FF6B00] text-white hover:bg-[#FF6B00]/90 font-medium"
+                                        : "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900",
+                                      isDisabled && "text-neutral-300 opacity-40 cursor-not-allowed pointer-events-none",
+                                    )}
+                                  >
+                                    {day.getDate()}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1006,19 +1159,17 @@ export default function RegisterPTPage() {
                       <label className="text-xs font-bold text-neutral-700">
                         Thời lượng buổi tập <span className="text-[#FF6B00]">*</span>
                       </label>
-                      <div className="relative">
-                        <select
-                          value={bookingDuration}
-                          onChange={(e) => setBookingDuration(e.target.value)}
-                          className="w-full appearance-none rounded-xl border border-neutral-200 bg-neutral-50 py-3 px-4 text-sm text-neutral-800 outline-none transition focus:border-[#FF6B00] focus:bg-white"
-                        >
-                          <option value="1 giờ">1 giờ</option>
-                          <option value="1.5 giờ">1.5 giờ</option>
-                          <option value="2 giờ">2 giờ</option>
-                          <option value="2.5 giờ">2.5 giờ</option>
-                        </select>
-                        <ChevronDown className="absolute right-4 top-3.5 h-4 w-4 text-neutral-455 pointer-events-none" />
-                      </div>
+                      <Select value={bookingDuration} onValueChange={setBookingDuration}>
+                        <SelectTrigger className="w-full rounded-lg border border-neutral-border bg-neutral-background px-4 py-2.5 text-xs font-semibold text-neutral-foreground">
+                          <SelectValue placeholder="Chọn thời lượng" />
+                        </SelectTrigger>
+                        <SelectContent className="z-55 rounded-lg border border-neutral-border bg-white p-1 shadow-xl">
+                          <SelectItem value="1 giờ">1 giờ</SelectItem>
+                          <SelectItem value="1.5 giờ">1.5 giờ</SelectItem>
+                          <SelectItem value="2 giờ">2 giờ</SelectItem>
+                          <SelectItem value="2.5 giờ">2.5 giờ</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                   </div>
@@ -1367,7 +1518,7 @@ export default function RegisterPTPage() {
                             </div>
                           </div>
                           <p className="text-xs text-neutral-500 leading-relaxed italic font-light">
-                            "{rev.comment}"
+                            &quot;{rev.comment}&quot;
                           </p>
                         </div>
                       ))}
@@ -1514,7 +1665,7 @@ export default function RegisterPTPage() {
               {/* Summary line */}
               <div className="mt-5 rounded-2xl bg-neutral-50 border border-neutral-100 p-3 flex justify-between text-xs text-neutral-600">
                 <span>Mã số hóa đơn:</span>
-                <span className="font-mono text-neutral-850">GMX-PT-{(Math.floor(Math.random() * 90000) + 10000)}</span>
+                <span className="font-mono text-neutral-850">{successInvoiceCode}</span>
               </div>
 
               {/* Navigation button */}

@@ -51,10 +51,14 @@ export default function FilterPanel({
   const ptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) return;
+
+    const resetId = window.setTimeout(() => {
       setIsPTDropdownOpen(false);
       setPtSearchQuery("");
-    }
+    }, 0);
+
+    return () => window.clearTimeout(resetId);
   }, [isOpen]);
 
   useEffect(() => {

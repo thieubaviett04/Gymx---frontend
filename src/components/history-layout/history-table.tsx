@@ -1,6 +1,15 @@
 import React from "react";
 import { Star } from "lucide-react";
 import { Booking } from "@/lib/mock-db";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export const getPTAvatar = (ptName: string) => {
   if (ptName.includes("Nguyễn Văn A")) {
@@ -10,6 +19,22 @@ export const getPTAvatar = (ptName: string) => {
     return "https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=200&auto=format&fit=crop";
   }
   return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"; // default fallback
+};
+
+const getVisiblePages = (currentPage: number, totalPages: number) => {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 3) {
+    return [1, 2, 3, "...", totalPages];
+  }
+
+  if (currentPage >= totalPages - 2) {
+    return [1, "...", totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
 };
 
 interface HistoryTableProps {
@@ -41,6 +66,8 @@ export default function HistoryTable({
   onPageChange,
   onClearFilters,
 }: HistoryTableProps) {
+  const visiblePages = getVisiblePages(currentPage, totalPages);
+
   // Kiểm tra buổi tập có bị quá hạn đánh giá không (Giới hạn 3 ngày từ mốc hôm nay là 2026-05-28)
   const isSessionExpired = (dateStr: string) => {
     const today = new Date("2026-05-28");
@@ -244,88 +271,80 @@ export default function HistoryTable({
       <div className="p-4 border-t border-neutral-border bg-neutral-muted/20 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 text-xs text-neutral-mutedforeground">
         <div className="flex items-center gap-1.5">
           <span>Hiển thị</span>
-          <div className="relative">
-            <select
-              value={String(pageSize).padStart(2, "0")}
-              onChange={(e) => {
-                onPageSizeChange(Number(e.target.value));
-              }}
-              className="pl-2.5 pr-6 py-1 border border-neutral-border bg-neutral-background rounded-md text-[11px] font-semibold text-neutral-foreground appearance-none cursor-pointer"
-            >
-              <option value="08">08</option>
-              <option value="10">10</option>
-              <option value="20">20</option>
-            </select>
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[8px]">
-              ▼
-            </div>
-          </div>
+          <Select
+            value={String(pageSize)}
+            onValueChange={(value) => onPageSizeChange(Number(value))}
+          >
+            <SelectTrigger className="h-8 w-[74px] rounded-md border border-neutral-border bg-white px-3 py-0 text-xs font-semibold text-neutral-800 shadow-sm [&_svg]:text-[#FF6B00]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="rounded-lg border-neutral-border bg-white shadow-xl">
+              <SelectItem value="8">08</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+            </SelectContent>
+          </Select>
           <span>
             trong tổng số {String(filteredBookingsCount).padStart(2, "0")} buổi tập
           </span>
         </div>
 
-        <div className="flex items-center gap-1">
-          <button
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             disabled={currentPage === 1}
             onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-            className="px-2.5 py-1 border border-neutral-border bg-neutral-background rounded-md hover:bg-neutral-muted transition-all cursor-pointer font-bold text-[10px] disabled:opacity-50 disabled:cursor-not-allowed text-neutral-foreground"
+            className="h-7 rounded-md px-1.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950 disabled:opacity-40"
           >
-            &lt; Trước
-          </button>
+            ‹ Trước
+          </Button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-            const isCurrent = page === currentPage;
-            const isFirstOrLast = page === 1 || page === totalPages;
-            const isWithinRange = Math.abs(page - currentPage) <= 1;
-
-            if (isFirstOrLast || isWithinRange) {
-              return (
-                <button
-                  key={page}
-                  onClick={() => onPageChange(page)}
-                  className={`w-7 h-7 font-bold rounded-md cursor-pointer text-[10px] transition-all ${
-                    isCurrent
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-neutral-background border border-neutral-border text-neutral-foreground hover:bg-neutral-muted"
-                  }`}
-                >
-                  {page}
-                </button>
-              );
-            }
-
-            if (page === 2 && currentPage > 3) {
+          {visiblePages.map((page, index) => {
+            if (page === "...") {
               return (
                 <span
-                  key="ellipsis-start"
-                  className="px-1 text-neutral-border font-bold"
-                >
-                  ...
-                </span>
-              );
-            }
-            if (page === totalPages - 1 && currentPage < totalPages - 2) {
-              return (
-                <span
-                  key="ellipsis-end"
-                  className="px-1 text-neutral-border font-bold"
+                  key={`ellipsis-${index}`}
+                  className="px-1 text-[11px] font-semibold text-neutral-500"
                 >
                   ...
                 </span>
               );
             }
 
-            return null;
+            const pageNum = page as number;
+            const isCurrent = pageNum === currentPage;
+
+            return (
+              <Button
+                key={pageNum}
+                type="button"
+                variant={isCurrent ? "default" : "ghost"}
+                size="icon-sm"
+                onClick={() => onPageChange(pageNum)}
+                className={cn(
+                  "h-7 w-7 rounded-md text-[11px] font-semibold",
+                  isCurrent
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-transparent text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950",
+                )}
+              >
+                {pageNum}
+              </Button>
+            );
           })}
 
-          <button
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
             disabled={currentPage === totalPages}
             onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-            className="px-2.5 py-1 border border-neutral-border bg-neutral-background rounded-md hover:bg-neutral-muted transition-all cursor-pointer font-bold text-[10px] disabled:opacity-50 disabled:cursor-not-allowed text-neutral-foreground"
+            className="h-7 rounded-md px-1.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950 disabled:opacity-40"
           >
-            Tiếp &gt;
-          </button>
+            Tiếp ›
+          </Button>
         </div>
       </div>
     </div>
