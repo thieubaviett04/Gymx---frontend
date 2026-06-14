@@ -2,6 +2,7 @@
 
 import { HomeLayout } from "@/components/home-layout";
 import HistoryLayout from "@/components/history-layout";
+import { Clock3 } from "lucide-react";
 
 export default function HistoryPage() {
   return (

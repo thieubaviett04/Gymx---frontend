@@ -42,10 +42,10 @@
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
 
   /* Custom Gym-X Theme Colors */
   --color-status-success: var(--status-success);
@@ -80,7 +80,7 @@
   --border: #E5E5E5;
   --input: #E5E5E5;
   --ring: #FF6B00;
-  --radius: 0.75rem;
+  --radius: 0.5rem;
   
   --sidebar: #FFFFFF;
   --sidebar-foreground: #0A0A0A;
