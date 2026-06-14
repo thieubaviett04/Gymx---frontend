@@ -1,5 +1,13 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SidePanel from "@/components/shared/side-panel";
+import { ChevronDown, Check } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -38,6 +46,32 @@ export default function FilterPanel({
   onReset,
   onApply,
 }: FilterPanelProps) {
+  const [isPTDropdownOpen, setIsPTDropdownOpen] = useState(false);
+  const [ptSearchQuery, setPtSearchQuery] = useState("");
+  const ptRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setIsPTDropdownOpen(false);
+      setPtSearchQuery("");
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ptRef.current && !ptRef.current.contains(event.target as Node)) {
+        setIsPTDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const ptOptions = ["Tất cả HLV", "Nguyễn Văn A", "Lê Thị B"];
+  const filteredPTs = ptOptions.filter((pt) =>
+    pt.toLowerCase().includes(ptSearchQuery.toLowerCase())
+  );
+
   return (
     <SidePanel isOpen={isOpen} onClose={onClose} title="Bộ lọc buổi tập">
       <div className="space-y-6 text-sm pb-8">
@@ -46,62 +80,111 @@ export default function FilterPanel({
           <label className="text-sm font-bold text-neutral-foreground">
             Dịch vụ
           </label>
-          <div className="flex gap-4 pt-1">
+          <div className="flex gap-4 pt-1 flex-wrap">
             <label className="flex items-center gap-2 cursor-pointer text-neutral-foreground font-semibold text-xs">
               <input
                 type="radio"
                 name="filter-service"
-                checked={tempFilterService === "Tăng cơ cơ bản"}
-                onChange={() => setTempFilterService("Tăng cơ cơ bản")}
+                checked={tempFilterService === "Không"}
+                onChange={() => setTempFilterService("Không")}
                 className="accent-primary"
               />
-              <span>Tăng cơ cơ bản</span>
+              <span>Không</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer text-neutral-foreground font-semibold text-xs">
               <input
                 type="radio"
                 name="filter-service"
-                checked={tempFilterService === "Tăng cơ chuyên sâu"}
-                onChange={() => setTempFilterService("Tăng cơ chuyên sâu")}
+                checked={tempFilterService === "Gói cơ bản"}
+                onChange={() => setTempFilterService("Gói cơ bản")}
                 className="accent-primary"
               />
-              <span>Tăng cơ chuyên sâu</span>
+              <span>Gói cơ bản</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-neutral-foreground font-semibold text-xs">
+              <input
+                type="radio"
+                name="filter-service"
+                checked={tempFilterService === "Gói nâng cao"}
+                onChange={() => setTempFilterService("Gói nâng cao")}
+                className="accent-primary"
+              />
+              <span>Gói nâng cao</span>
             </label>
           </div>
         </div>
 
-        {/* Đánh giá: Dropdown */}
+        {/* Đánh giá: Dropdown Shadcn / Base UI */}
         <div className="space-y-2">
           <label className="text-sm font-bold text-neutral-foreground">
             Đánh giá
           </label>
-          <select
+          <Select
             value={tempFilterRatingStatus}
-            onChange={(e) => setTempFilterRatingStatus(e.target.value)}
-            className="w-full bg-neutral-background border border-neutral-border rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-primary text-neutral-foreground font-semibold text-xs"
+            onValueChange={(val) => setTempFilterRatingStatus(val || "Tất cả")}
           >
-            <option value="Tất cả">Tất cả</option>
-            <option value="Chưa đánh giá">Chưa đánh giá</option>
-            <option value="Đã đánh giá">Đã đánh giá</option>
-            <option value="Quá hạn đánh giá">Quá hạn đánh giá</option>
-            <option value="Không áp dụng">Không áp dụng</option>
-          </select>
+            <SelectTrigger className="w-full bg-neutral-background border border-neutral-border rounded-lg px-4 py-2.5 text-xs text-neutral-foreground font-semibold">
+              <SelectValue placeholder="Chọn trạng thái đánh giá" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border border-neutral-border rounded-lg shadow-xl p-1 z-55">
+              <SelectItem value="Tất cả">Tất cả</SelectItem>
+              <SelectItem value="Chưa đánh giá">Chưa đánh giá</SelectItem>
+              <SelectItem value="Đã đánh giá">Đã đánh giá</SelectItem>
+              <SelectItem value="Quá hạn đánh giá">Quá hạn đánh giá</SelectItem>
+              <SelectItem value="Không áp dụng">Không áp dụng</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        {/* Huấn luyện viên: Dropdown */}
-        <div className="space-y-2">
+        {/* Huấn luyện viên: Combobox */}
+        <div className="space-y-2 relative" ref={ptRef}>
           <label className="text-sm font-bold text-neutral-foreground">
             Huấn luyện viên
           </label>
-          <select
-            value={tempFilterPT}
-            onChange={(e) => setTempFilterPT(e.target.value)}
-            className="w-full bg-neutral-background border border-neutral-border rounded-lg p-2.5 focus:outline-none focus:ring-1 focus:ring-primary text-neutral-foreground font-semibold text-xs"
+          <button
+            type="button"
+            onClick={() => setIsPTDropdownOpen(!isPTDropdownOpen)}
+            className="flex w-full items-center justify-between gap-1.5 rounded-lg border border-neutral-border bg-neutral-background px-4 py-2.5 text-xs text-neutral-foreground font-semibold outline-none select-none transition-colors focus:border-primary text-left cursor-pointer"
           >
-            <option value="Tất cả HLV">Tất cả HLV</option>
-            <option value="Nguyễn Văn A">Nguyễn Văn A</option>
-            <option value="Lê Thị B">Lê Thị B</option>
-          </select>
+            <span>{tempFilterPT}</span>
+            <ChevronDown className="w-4 h-4 text-neutral-400" />
+          </button>
+          
+          {isPTDropdownOpen && (
+            <div className="absolute z-55 mt-1 w-full bg-white border border-neutral-border rounded-lg shadow-xl p-1 max-h-60 overflow-y-auto">
+              <input
+                type="text"
+                placeholder="Tìm kiếm HLV..."
+                value={ptSearchQuery}
+                onChange={(e) => setPtSearchQuery(e.target.value)}
+                className="w-full px-3 py-2 text-xs border-b border-neutral-border focus:outline-none focus:border-primary mb-1 font-semibold text-[#0A0A0A] bg-white outline-none"
+              />
+              <div className="flex flex-col gap-0.5">
+                {filteredPTs.map((pt) => {
+                  const isSelected = tempFilterPT === pt;
+                  return (
+                    <button
+                      key={pt}
+                      type="button"
+                      onClick={() => {
+                        setTempFilterPT(pt);
+                        setIsPTDropdownOpen(false);
+                        setPtSearchQuery("");
+                      }}
+                      className={`flex w-full cursor-pointer items-center justify-between rounded-[6px] py-1.5 px-3 text-xs font-semibold outline-none select-none transition-colors text-left ${
+                        isSelected
+                          ? "bg-[#FFF0E5] text-[#FF6B00]"
+                          : "text-[#0A0A0A] hover:bg-[#F5F5F5] hover:text-[#FF6B00]"
+                      }`}
+                    >
+                      <span>{pt}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B00]" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Trạng thái: Checkboxes */}
@@ -119,7 +202,7 @@ export default function FilterPanel({
                 }
                 className="accent-primary w-4 h-4"
               />
-              <span>Đã hoàn thành</span>
+              <span>Hoàn thành</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer text-neutral-foreground">
               <input

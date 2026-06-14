@@ -315,12 +315,14 @@ export default function HistoryLayout() {
     // 2. Tìm kiếm theo tên HLV hoặc Dịch vụ
     const matchesSearch =
       b.ptName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (b.serviceName &&
-        b.serviceName.toLowerCase().includes(searchQuery.toLowerCase()));
+      (b.serviceName || "Không").toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
 
     // 3. Lọc theo Dịch vụ (Bộ lọc nâng cao)
-    if (filterService && b.serviceName !== filterService) return false;
+    if (filterService) {
+      const bService = b.serviceName || "Không";
+      if (bService !== filterService) return false;
+    }
 
     // 4. Lọc theo Đánh giá
     if (filterRatingStatus === "Chưa đánh giá") {
