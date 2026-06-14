@@ -5,134 +5,87 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Bell,
-  CalendarDays,
   ChevronDown,
-  Clock3,
-  CreditCard,
-  Dumbbell,
   LayoutGrid,
   Menu,
-  ReceiptText,
-  LogOut,
+  Bookmark,
+  Users,
+  CalendarDays,
+  FileText,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface HomeLayoutProps {
+interface ReceptionistLayoutProps {
   children: React.ReactNode;
   pageTitle?: React.ReactNode;
   pageSubtitle?: React.ReactNode;
-  pageIcon?: React.ReactNode;
 }
 
-type MenuSubItem = {
+type MenuItem = {
   id: string;
   label: string;
+  icon: React.ComponentType<{ className?: string }>;
   onClick: () => void;
 };
 
-type MenuItem =
-  | {
-      id: string;
-      label: string;
-      icon: React.ComponentType<{ className?: string }>;
-      onClick: () => void;
-      hasSubmenu?: false;
-    }
-  | {
-      id: string;
-      label: string;
-      icon: React.ComponentType<{ className?: string }>;
-      hasSubmenu: true;
-      isOpen: boolean;
-      onToggle: () => void;
-      submenu: MenuSubItem[];
-    };
-
-const featureUnavailable = (name: string) => {
-  alert(`${name} sẽ được cập nhật sau!`);
-};
-
-export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: HomeLayoutProps) {
+export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: ReceptionistLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [authorized, setAuthorized] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isRegisterDropdownOpen, setIsRegisterDropdownOpen] = useState(
-    pathname.startsWith("/memberships")
-  );
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     if (!role) {
       router.push("/login");
-    } else if (role !== "hoivien") {
-      router.push("/receptionist");
+    } else if (role !== "letan") {
+      router.push("/");
     } else {
       setAuthorized(true);
     }
   }, [router]);
 
-  useEffect(() => {
-    setIsRegisterDropdownOpen(pathname.startsWith("/memberships"));
-  }, [pathname]);
+  const featureUnavailable = (name: string) => {
+    alert(`${name} sẽ được cập nhật sau!`);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("userRole");
     router.push("/login");
   };
 
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-
   const menuItems: MenuItem[] = [
     {
       id: "home",
       label: "Trang chủ",
       icon: LayoutGrid,
-      onClick: () => router.push("/"),
+      onClick: () => router.push("/receptionist"),
     },
     {
-      id: "register-group",
-      label: "Đăng ký & Gia hạn",
-      icon: CreditCard,
-      hasSubmenu: true,
-      isOpen: isRegisterDropdownOpen,
-      onToggle: () => setIsRegisterDropdownOpen((open) => !open),
-      submenu: [
-        {
-  id: "register-package",
-  label: "Đăng ký",
-  onClick: () => router.push("/memberships"),
-},
-        {
-          id: "renew-package",
-          label: "Gia hạn",
-          onClick: () => featureUnavailable("Gia hạn gói tập"),
-        },
-      ],
+      id: "register-package",
+      label: "Đăng ký gói tập",
+      icon: Bookmark,
+      onClick: () => featureUnavailable("Đăng ký gói tập"),
     },
     {
-      id: "register-pt",
-      label: "Đăng ký huấn luyện viên",
-      icon: Dumbbell,
-      onClick: () => router.push("/register-pt"),
+      id: "manage-members",
+      label: "Quản lý hội viên",
+      icon: Users,
+      onClick: () => featureUnavailable("Quản lý hội viên"),
     },
     {
-      id: "schedule",
-      label: "Lịch tập",
+      id: "workout-schedule",
+      label: "Lịch làm việc",
       icon: CalendarDays,
-      onClick: () => featureUnavailable("Lịch tập"),
+      onClick: () => featureUnavailable("Lịch làm việc"),
     },
     {
-      id: "history-workout",
-      label: "Lịch sử tập",
-      icon: Clock3,
-      onClick: () => router.push("/history"),
-    },
-    {
-      id: "history-payment",
-      label: "Lịch sử thanh toán",
-      icon: ReceiptText,
-      onClick: () => featureUnavailable("Lịch sử thanh toán"),
+      id: "register-schedule",
+      label: "Đăng ký lịch làm việc",
+      icon: FileText,
+      onClick: () => router.push("/receptionist/schedule"),
     },
   ];
 
@@ -142,74 +95,10 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
         const Icon = item.icon;
         const isActive =
           item.id === "home"
-            ? pathname === "/"
-            : item.id === "history-workout"
-            ? pathname === "/history"
-            : item.id === "register-pt"
-            ? pathname === "/register-pt"
+            ? pathname === "/receptionist"
+            : item.id === "register-schedule"
+            ? pathname === "/receptionist/schedule"
             : false;
-
-        if (item.hasSubmenu) {
-          const isParentActive = item.submenu.some(sub => {
-            if (sub.id === "register-package") return pathname === "/memberships";
-            return false;
-          });
-
-          return (
-            <div key={item.id} className="space-y-2">
-              <button
-                onClick={item.onToggle}
-                className={cn(
-                  "flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-colors",
-                  isParentActive
-                    ? "text-neutral-900 font-bold bg-neutral-50/50"
-                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
-                )}
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <Icon className={cn("h-5 w-5 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
-                  <span className="truncate">{item.label}</span>
-                </div>
-                {item.isOpen ? (
-                  <ChevronDown className={cn("h-4 w-4 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
-                ) : (
-                  <ChevronDown className={cn("h-4 w-4 shrink-0 -rotate-90 transition-transform", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
-                )}
-              </button>
-
-              {item.isOpen && (
-                <div className="space-y-1 pl-12">
-                  {item.submenu.map((sub) => {
-                    const isSubActive =
-                      sub.id === "register-package"
-                        ? pathname === "/memberships"
-                        : sub.id === "renew-package"
-                        ? pathname === "/renew-package"
-                        : false;
-
-                    return (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          sub.onClick();
-                          if (closeMobile) setIsMobileSidebarOpen(false);
-                        }}
-                        className={cn(
-                          "block w-full cursor-pointer rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors",
-                          isSubActive
-                            ? "bg-[#FFF0E5] text-[#FF6B00] font-bold"
-                            : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
-                        )}
-                      >
-                        {sub.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        }
 
         return (
           <button
@@ -219,7 +108,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
               if (closeMobile) setIsMobileSidebarOpen(false);
             }}
             className={cn(
-              "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+              "flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-colors",
               isActive
                 ? "bg-[#FFF0E5] text-[#FF6B00]"
                 : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
@@ -246,16 +135,17 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-900 font-sans text-neutral-900">
+      {/* Desktop Sidebar */}
       <aside className="hidden h-full w-[260px] shrink-0 select-none flex-col border-r border-neutral-200 bg-white md:flex">
         <div className="flex items-center justify-center gap-2 border-b border-neutral-100 p-6 text-center">
           <span className="text-2xl font-bold tracking-tight text-neutral-900">
             Gym <span className="text-[#FF6B00]">Max</span>
           </span>
         </div>
-
         {renderNav()}
       </aside>
 
+      {/* Mobile Sidebar backdrop */}
       {isMobileSidebarOpen && (
         <div
           onClick={() => setIsMobileSidebarOpen(false)}
@@ -263,6 +153,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
         />
       )}
 
+      {/* Mobile Sidebar drawer */}
       <aside
         className={cn(
           "fixed bottom-0 left-0 top-0 z-50 flex w-[260px] flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:hidden",
@@ -274,10 +165,10 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
             Gym <span className="text-[#FF6B00]">Max</span>
           </span>
         </div>
-
         {renderNav(true)}
       </aside>
 
+      {/* Main Content Area */}
       <main
         className="relative flex h-full flex-1 flex-col overflow-hidden"
         style={{
@@ -293,7 +184,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
             <div className="flex min-w-0 items-center gap-3">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10"
+                className="cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10 md:hidden"
                 aria-label="Mở menu"
               >
                 <svg
@@ -310,11 +201,11 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
                 </svg>
               </button>
               <div className="min-w-0 space-y-0.5 text-white">
-                <h4 className="truncate text-xl font-semibold leading-7">
-                  {pageTitle || "Xin chào Hội viên!"}
+                <h4 className="truncate text-xl font-bold leading-7">
+                  {pageTitle || "Xin chào Lễ tân!"}
                 </h4>
                 {((!pageTitle && !pageSubtitle) || pageSubtitle) && (
-                  <div className="truncate text-sm text-neutral-300">
+                  <div className="truncate text-sm font-medium text-neutral-300">
                     {pageSubtitle || "Chọn một thao tác bên dưới để bắt đầu."}
                   </div>
                 )}
@@ -323,13 +214,15 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
 
             <div className="flex shrink-0 items-center gap-4">
               <button
-                className="relative cursor-pointer rounded-full p-2 text-neutral-300 hover:bg-white/5 hover:text-white"
+                className="relative cursor-pointer rounded-full p-2 text-neutral-350 hover:bg-white/5 hover:text-white"
                 aria-label="Thông báo"
+                onClick={() => alert("Chức năng thông báo sẽ được cập nhật sau!")}
               >
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5 text-white" />
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-neutral-950" />
               </button>
 
+              {/* Avatar profile area with Dropdown logout */}
               <div className="relative flex items-center gap-3 border-l border-white/10 pl-2">
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -337,8 +230,8 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
                   aria-label="User menu"
                 >
                   <Image
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                    alt="Member profile avatar"
+                    src="/avatar.png"
+                    alt="Receptionist profile avatar"
                     width={36}
                     height={36}
                     className="h-full w-full object-cover"
@@ -354,7 +247,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
                     <div className="absolute right-0 top-11 z-50 mt-1 w-48 rounded-xl border border-neutral-250 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-3 py-2 border-b border-neutral-100">
                         <p className="text-[10px] font-semibold text-neutral-400 uppercase">Vai trò</p>
-                        <p className="text-sm font-bold text-neutral-800">Hội Viên</p>
+                        <p className="text-sm font-bold text-neutral-800">Lễ Tân</p>
                       </div>
                       <button
                         onClick={handleLogout}
