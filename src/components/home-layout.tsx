@@ -73,10 +73,10 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
       onToggle: () => setIsRegisterDropdownOpen((open) => !open),
       submenu: [
         {
-          id: "register-package",
-          label: "Đăng ký",
-          onClick: () => featureUnavailable("Đăng ký gói tập"),
-        },
+  id: "register-package",
+  label: "Đăng ký",
+  onClick: () => router.push("/memberships"),
+},
         {
           id: "renew-package",
           label: "Gia hạn",
