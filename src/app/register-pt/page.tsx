@@ -355,6 +355,7 @@ export default function RegisterPTPage() {
   // Navigation / Flow states
   const [step, setStep] = useState<"list" | "form">("list");
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
+  const [showCancelAlert, setShowCancelAlert] = useState(false);
 
   // Drawer / Modal states
   const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
@@ -399,6 +400,21 @@ export default function RegisterPTPage() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("cancelled") === "true") {
+      setShowCancelAlert(true);
+      params.delete("cancelled");
+      const cleanUrl = window.location.pathname + (params.toString() ? `?${params.toString()}` : "");
+      window.history.replaceState(null, "", cleanUrl);
+      
+      const timer = setTimeout(() => {
+        setShowCancelAlert(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // Booking Form states
@@ -523,10 +539,36 @@ export default function RegisterPTPage() {
   };
 
   const handleBookingSubmit = () => {
-    const invoiceNumber = Math.floor(Math.random() * 90000) + 10000;
-    setSuccessInvoiceCode(`GMX-PT-${invoiceNumber}`);
+    if (!selectedTrainer) return;
+
+    const selectedAddons = selectedServices
+      .map((serviceId) => SERVICES_OPTIONS.find((service) => service.id === serviceId))
+      .filter((service): service is (typeof SERVICES_OPTIONS)[number] => Boolean(service))
+      .map((service) => ({
+        id: service.id,
+        name: service.name,
+        price: service.price,
+      }));
+
+    const checkout = {
+      id: `INV-PT-${Date.now()}`,
+      source: "pt",
+      packageId: selectedTrainer.id,
+      packageName: `Lịch tập với ${selectedTrainer.name}`,
+      duration: bookingDuration,
+      durationLabel: bookingDuration,
+      startDate: bookingDate,
+      trainerName: selectedTrainer.name,
+      timeSlot: selectedTimeSlot ?? "--",
+      endTime,
+      selectedAddons,
+      amount: billSummary.total,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("gym_pending_payment", JSON.stringify(checkout));
     setIsConfirmModalOpen(false);
-    setIsSuccessModalOpen(true);
+    router.push("/payment");
   };
 
   // Format money helper
@@ -536,7 +578,7 @@ export default function RegisterPTPage() {
 
   return (
     <HomeLayout
-      pageTitle="Đăng ký tập với HLV"
+      pageTitle="Đăng ký lịch tập với HLV"
       pageSubtitle={
         step === "list" ? (
           "Chọn một huấn luyện viên bên dưới để bắt đầu."
@@ -566,6 +608,25 @@ export default function RegisterPTPage() {
         )
       }
     >
+      {showCancelAlert && (
+        <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-red-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EF4444] text-white shadow-xs">
+            <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[#EF4444]">
+              <X className="h-2.5 w-2.5 stroke-[3]" />
+            </div>
+          </div>
+          <span className="text-sm font-normal text-neutral-800">
+            Thanh toán đã bị hủy
+          </span>
+          <button
+            onClick={() => setShowCancelAlert(false)}
+            className="ml-auto text-neutral-400 hover:text-neutral-600 cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       <div className="w-full animate-in fade-in duration-300">
         
         {/* STEP 1: TRAINER LIST */}
@@ -1159,8 +1220,8 @@ export default function RegisterPTPage() {
                       <label className="text-xs font-bold text-neutral-700">
                         Thời lượng buổi tập <span className="text-[#FF6B00]">*</span>
                       </label>
-                      <Select value={bookingDuration} onValueChange={setBookingDuration}>
-                        <SelectTrigger className="w-full rounded-lg border border-neutral-border bg-neutral-background px-4 py-2.5 text-xs font-semibold text-neutral-foreground">
+                      <Select value={bookingDuration} onValueChange={(val) => setBookingDuration(val || "1 giờ")}>
+                        <SelectTrigger className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-800 hover:bg-neutral-100/50 hover:border-neutral-300 transition cursor-pointer select-none">
                           <SelectValue placeholder="Chọn thời lượng" />
                         </SelectTrigger>
                         <SelectContent className="z-55 rounded-lg border border-neutral-border bg-white p-1 shadow-xl">
