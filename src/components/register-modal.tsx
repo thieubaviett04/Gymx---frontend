@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { CalendarDays, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type SelectedPackage = {
@@ -56,12 +56,18 @@ export default function RegisterModal({
   onClose,
   selectedPackage,
 }: Props) {
+  const router = useRouter();
   const [startDate, setStartDate] = useState("");
   const [showDateError, setShowDateError] = useState(false);
   const [dateErrorMessage, setDateErrorMessage] = useState("");
   const [showWarning, setShowWarning] = useState(false);
   const [benefits, setBenefits] = useState<string[]>([]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [minStartDate] = useState(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  });
 
   // Calendar states
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 4, 28)); // default to May 2026 mimicking mockup
@@ -69,7 +75,9 @@ export default function RegisterModal({
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+
+    const resetId = window.setTimeout(() => {
       setStartDate("");
       setShowDateError(false);
       setDateErrorMessage("");
@@ -78,7 +86,9 @@ export default function RegisterModal({
       setIsSuccess(false);
       setIsCalendarOpen(false);
       setCalendarMonth(new Date(2026, 4, 28)); // default month
-    }
+    }, 0);
+
+    return () => window.clearTimeout(resetId);
   }, [open, selectedPackage]);
 
   // Handle click outside to close calendar
@@ -110,10 +120,6 @@ export default function RegisterModal({
 
   const basePrice = parsePrice(selectedPackage?.price);
   const totalPrice = basePrice + benefits.length * 50000;
-
-  const now = new Date();
-  const today = toDateValue(now);
-  const minStartDate = now;
 
   const getDurationMonths = (durationStr?: string) => {
     if (!durationStr) return 1;
@@ -155,7 +161,34 @@ export default function RegisterModal({
       return;
     }
 
-    setIsSuccess(true);
+    handleGoToPayment();
+  };
+
+  const handleGoToPayment = () => {
+    if (!selectedPackage) return;
+
+    const benefitOptions = [
+      { id: "nutrition", name: "Tư vấn dinh dưỡng cá nhân", price: 50000 },
+      { id: "pt", name: "HLV Cá nhân kèm sát", price: 50000 },
+      { id: "sauna", name: "Xông hơi VIP", price: 50000 },
+      { id: "towel", name: "Mượn khăn miễn phí", price: 50000 },
+    ];
+
+    const checkout = {
+      id: `INV-${Date.now()}`,
+      source: "membership",
+      packageId: selectedPackage.id,
+      packageName: selectedPackage.name,
+      duration: selectedPackage.duration,
+      startDate,
+      selectedAddons: benefitOptions.filter((benefit) => benefits.includes(benefit.id)),
+      amount: totalPrice,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("gym_pending_payment", JSON.stringify(checkout));
+    handleClose();
+    router.push("/payment");
   };
 
   const calendarDays = getCalendarDays(calendarMonth);
@@ -480,7 +513,7 @@ export default function RegisterModal({
 
               <div className="flex flex-col gap-2.5 pt-3">
                 <button
-                  onClick={handleClose}
+                  onClick={handleGoToPayment}
                   className="w-full rounded-xl bg-[#FF6B00] py-2.5 text-xs font-bold text-white transition hover:bg-[#CC5500] shadow-md shadow-[#FF6B00]/10 cursor-pointer select-none bg-gradient-to-r from-[#FF6B00] to-[#FF8833] hover:from-[#CC5500] hover:to-[#FF6B00]"
                 >
                   Xong (Đi tới thanh toán)
