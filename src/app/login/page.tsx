@@ -10,7 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -24,21 +25,29 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
+    setPhoneError("");
+    setPasswordError("");
 
-    if (!phoneNumber || !password) {
-      setErrorMessage("Vui lòng nhập đầy đủ số điện thoại và mật khẩu!");
+    if (!phoneNumber.trim() || !password.trim()) {
       return;
     }
 
-    if (phoneNumber === "0123456789" && password === "hoivien123") {
-      localStorage.setItem("userRole", "hoivien");
-      router.push("/");
-    } else if (phoneNumber === "0987654321" && password === "letan123") {
-      localStorage.setItem("userRole", "letan");
-      router.push("/receptionist");
+    if (phoneNumber === "0123456789") {
+      if (password === "hoivien123") {
+        localStorage.setItem("userRole", "hoivien");
+        router.push("/");
+      } else {
+        setPasswordError("Mật khẩu không hợp lệ!");
+      }
+    } else if (phoneNumber === "0987654321") {
+      if (password === "letan123") {
+        localStorage.setItem("userRole", "letan");
+        router.push("/receptionist");
+      } else {
+        setPasswordError("Mật khẩu không hợp lệ!");
+      }
     } else {
-      setErrorMessage("Số điện thoại hoặc mật khẩu không chính xác!");
+      setPhoneError("Số điện thoại không tồn tại!");
     }
   };
 
@@ -72,14 +81,6 @@ export default function LoginPage() {
           Chào mừng bạn tới với hệ thống, đăng nhập để bắt đầu
         </p>
 
-        {/* Error Alert */}
-        {errorMessage && (
-          <div className="w-full flex items-center gap-2 bg-rose-50 text-rose-600 border border-rose-100 text-xs font-semibold px-4 py-3 rounded-xl mb-4">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
         {/* Form */}
         <form onSubmit={handleLogin} className="w-full flex flex-col">
           {/* Phone Number Field */}
@@ -93,10 +94,23 @@ export default function LoginPage() {
               pattern="[0-9]*"
               inputMode="numeric"
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(e) => {
+                setPhoneNumber(e.target.value);
+                setPhoneError("");
+              }}
               placeholder="Nhập số điện thoại của bạn"
-              className="w-full border border-neutral-200 text-sm px-4 py-3.5 rounded-xl focus:outline-none focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-colors placeholder:text-neutral-300 text-neutral-800 font-medium"
+              className={`w-full border text-sm px-4 py-3.5 rounded-xl focus:outline-none transition-colors placeholder:text-neutral-300 text-neutral-800 font-medium ${
+                phoneError
+                  ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                  : "border-neutral-200 focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00]"
+              }`}
             />
+            {phoneError && (
+              <p className="text-rose-500 text-xs font-bold mt-1 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{phoneError}</span>
+              </p>
+            )}
           </div>
 
           {/* Password Field */}
@@ -109,9 +123,16 @@ export default function LoginPage() {
                 id="pass"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordError("");
+                }}
                 placeholder="Nhập mật khẩu của bạn"
-                className="w-full border border-neutral-200 text-sm pl-4 pr-10 py-3.5 rounded-xl focus:outline-none focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] transition-colors placeholder:text-neutral-300 text-neutral-850 font-medium"
+                className={`w-full border text-sm pl-4 pr-10 py-3.5 rounded-xl focus:outline-none transition-colors placeholder:text-neutral-300 text-neutral-850 font-medium ${
+                  passwordError
+                    ? "border-rose-500 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
+                    : "border-neutral-200 focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00]"
+                }`}
               />
               <button
                 type="button"
@@ -122,6 +143,12 @@ export default function LoginPage() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            {passwordError && (
+              <p className="text-rose-500 text-xs font-bold mt-1 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{passwordError}</span>
+              </p>
+            )}
           </div>
 
           {/* Checkbox and Forgot Password Link */}
