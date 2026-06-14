@@ -54,7 +54,14 @@ const featureUnavailable = (name: string) => {
 export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: HomeLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isRegisterDropdownOpen, setIsRegisterDropdownOpen] = useState(true);
+  const [isRegisterDropdownOpen, setIsRegisterDropdownOpen] = useState(
+    pathname.startsWith("/memberships")
+  );
+
+  React.useEffect(() => {
+    setIsRegisterDropdownOpen(pathname.startsWith("/memberships"));
+  }, [pathname]);
+
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const menuItems: MenuItem[] = [
@@ -124,37 +131,61 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
             : false;
 
         if (item.hasSubmenu) {
+          const isParentActive = item.submenu.some(sub => {
+            if (sub.id === "register-package") return pathname === "/memberships";
+            return false;
+          });
+
           return (
             <div key={item.id} className="space-y-2">
               <button
                 onClick={item.onToggle}
-                className="flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
+                className={cn(
+                  "flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                  isParentActive
+                    ? "text-neutral-900 font-bold bg-neutral-50/50"
+                    : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                )}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <Icon className="h-5 w-5 shrink-0" />
+                  <Icon className={cn("h-5 w-5 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
                   <span className="truncate">{item.label}</span>
                 </div>
                 {item.isOpen ? (
-                  <ChevronDown className="h-4 w-4 shrink-0" />
+                  <ChevronDown className={cn("h-4 w-4 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
                 ) : (
-                  <ChevronDown className="h-4 w-4 shrink-0 -rotate-90 transition-transform" />
+                  <ChevronDown className={cn("h-4 w-4 shrink-0 -rotate-90 transition-transform", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
                 )}
               </button>
 
               {item.isOpen && (
                 <div className="space-y-1 pl-12">
-                  {item.submenu.map((sub) => (
-                    <button
-                      key={sub.id}
-                      onClick={() => {
-                        sub.onClick();
-                        if (closeMobile) setIsMobileSidebarOpen(false);
-                      }}
-                      className="block w-full cursor-pointer rounded-lg px-4 py-2.5 text-left text-sm font-medium text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-800"
-                    >
-                      {sub.label}
-                    </button>
-                  ))}
+                  {item.submenu.map((sub) => {
+                    const isSubActive =
+                      sub.id === "register-package"
+                        ? pathname === "/memberships"
+                        : sub.id === "renew-package"
+                        ? pathname === "/renew-package"
+                        : false;
+
+                    return (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          sub.onClick();
+                          if (closeMobile) setIsMobileSidebarOpen(false);
+                        }}
+                        className={cn(
+                          "block w-full cursor-pointer rounded-lg px-4 py-2.5 text-left text-sm font-medium transition-colors",
+                          isSubActive
+                            ? "bg-[#FFF0E5] text-[#FF6B00] font-bold"
+                            : "text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
+                        )}
+                      >
+                        {sub.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -175,7 +206,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
                 : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
             )}
           >
-            <Icon className="h-5 w-5 shrink-0" />
+            <Icon className={cn("h-5 w-5 shrink-0", isActive ? "text-[#FF6B00]" : "text-neutral-600")} />
             <span className="truncate">{item.label}</span>
           </button>
         );
