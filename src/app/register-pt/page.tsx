@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { HomeLayout } from "@/components/home-layout";
 import { useRouter } from "next/navigation";
 import {
@@ -862,12 +861,12 @@ React.useEffect(() => {
                 className={cn(
                   "w-4 h-4 rounded border flex items-center justify-center transition",
                   tempCategories.length === 0
-                    ? "border-[#FF6B00] bg-[#FF6B00]/10"
-                    : "border-neutral-300"
+                    ? "border-[#FF6B00] bg-[#FF6B00]"
+                    : "border-neutral-300 bg-white"
                 )}
               >
                 {tempCategories.length === 0 && (
-                  <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
+                  <Check className="h-3 w-3 text-white stroke-[3]" />
                 )}
               </div>
               <span>Tất cả</span>
@@ -898,12 +897,12 @@ React.useEffect(() => {
                     className={cn(
                       "w-4 h-4 rounded border flex items-center justify-center transition",
                       isChecked
-                        ? "border-[#FF6B00] bg-[#FF6B00]/10"
-                        : "border-neutral-300"
+                        ? "border-[#FF6B00] bg-[#FF6B00]"
+                        : "border-neutral-300 bg-white"
                     )}
                   >
                     {isChecked && (
-                      <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
+                      <Check className="h-3 w-3 text-white stroke-[3]" />
                     )}
                   </div>
                   <span>{cat}</span>
@@ -1027,12 +1026,10 @@ React.useEffect(() => {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex gap-3">
                           <div className="relative h-14 w-14 overflow-hidden rounded-full border border-neutral-200 shadow-sm">
-                            <Image
+                            <img
                               src={trainer.avatar}
                               alt={trainer.name}
-                              fill
-                              sizes="56px"
-                              className="object-cover"
+                              className="w-full h-full object-cover"
                             />
                           </div>
                           <div>
@@ -1200,12 +1197,10 @@ React.useEffect(() => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex gap-4">
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-neutral-200 shadow-sm">
-                        <Image
+                        <img
                           src={selectedTrainer.avatar}
                           alt={selectedTrainer.name}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                       <div>
@@ -1629,12 +1624,10 @@ React.useEffect(() => {
                   
                   {/* Photo Profile Cover Banner */}
                   <div className="relative h-60 w-full overflow-hidden rounded-2xl border border-neutral-100">
-                    <Image
+                    <img
                       src={selectedTrainer.avatar}
                       alt={selectedTrainer.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 400px"
-                      className="object-cover"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                     

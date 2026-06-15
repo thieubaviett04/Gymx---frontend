@@ -21,7 +21,7 @@ export const getPTAvatar = (ptName: string) => {
   return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"; // default fallback
 };
 
-const getVisiblePages = (currentPage: number, totalPages: number) => {
+export const getVisiblePages = (currentPage: number, totalPages: number) => {
   if (totalPages <= 5) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }
@@ -43,13 +43,9 @@ interface HistoryTableProps {
   selectedBooking: Booking | null;
   isDetailsOpen: boolean;
   startIndex: number;
-  pageSize: number;
-  currentPage: number;
-  totalPages: number;
   onSelectRow: (booking: Booking) => void;
-  onPageSizeChange: (size: number) => void;
-  onPageChange: (page: number) => void;
   onClearFilters: () => void;
+  onOpenRating: (booking: Booking) => void;
 }
 
 export default function HistoryTable({
@@ -58,16 +54,10 @@ export default function HistoryTable({
   selectedBooking,
   isDetailsOpen,
   startIndex,
-  pageSize,
-  currentPage,
-  totalPages,
   onSelectRow,
-  onPageSizeChange,
-  onPageChange,
   onClearFilters,
+  onOpenRating,
 }: HistoryTableProps) {
-  const visiblePages = getVisiblePages(currentPage, totalPages);
-
   // Kiểm tra buổi tập có bị quá hạn đánh giá không (Giới hạn 3 ngày từ mốc hôm nay là 2026-05-28)
   const isSessionExpired = (dateStr: string) => {
     const today = new Date("2026-05-28");
@@ -120,7 +110,7 @@ export default function HistoryTable({
       ) : (
         /* Table Area */
         <div className="flex-1 overflow-y-auto">
-          <table className="w-full table-fixed text-left text-xs border-collapse">
+          <table className="w-full table-fixed text-left text-sm border-collapse">
             <colgroup>
               <col style={{ width: "50px" }} />
               <col style={{ width: "22%" }} />
@@ -158,14 +148,14 @@ export default function HistoryTable({
                     }`}
                   >
                     <td
-                      className={`py-4 px-4 text-center font-bold text-neutral-mutedforeground transition-colors ${
+                      className={`h-[68px] px-4 text-center font-bold text-neutral-mutedforeground transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
                       {startIndex + index + 1}
                     </td>
                     <td
-                      className={`py-4 px-4 transition-colors ${
+                      className={`h-[68px] px-4 transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
@@ -181,28 +171,28 @@ export default function HistoryTable({
                       </div>
                     </td>
                     <td
-                      className={`py-4 px-4 text-neutral-foreground font-bold transition-colors ${
+                      className={`h-[68px] px-4 text-neutral-foreground font-bold transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
                       {b.serviceName || "Không"}
                     </td>
                     <td
-                      className={`py-4 px-4 text-neutral-mutedforeground transition-colors ${
+                      className={`h-[68px] px-4 text-neutral-mutedforeground transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
                       {formattedDate}
                     </td>
                     <td
-                      className={`py-4 px-4 text-neutral-mutedforeground transition-colors ${
+                      className={`h-[68px] px-4 text-neutral-mutedforeground transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
                       {b.timeSlot}
                     </td>
                     <td
-                      className={`py-4 px-4 transition-colors ${
+                      className={`h-[68px] px-4 transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
@@ -223,7 +213,7 @@ export default function HistoryTable({
                       )}
                     </td>
                     <td
-                      className={`py-4 px-4 transition-colors ${
+                      className={`h-[68px] px-4 transition-colors ${
                         isSelected ? "bg-neutral-muted" : ""
                       }`}
                     >
@@ -254,9 +244,16 @@ export default function HistoryTable({
                           Quá hạn đánh giá
                         </span>
                       ) : (
-                        <span className="text-neutral-mutedforeground text-[10px]">
-                          Chưa có đánh giá
-                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenRating(b);
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#FFF0E5] text-[#FF6B00] hover:bg-[#FF6B00] hover:text-white transition-colors"
+                        >
+                          Đánh giá
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -266,87 +263,6 @@ export default function HistoryTable({
           </table>
         </div>
       )}
-
-      {/* Footer pagination */}
-      <div className="p-4 border-t border-neutral-border bg-neutral-muted/20 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0 text-xs text-neutral-mutedforeground">
-        <div className="flex items-center gap-1.5">
-          <span>Hiển thị</span>
-          <Select
-            value={String(pageSize)}
-            onValueChange={(value) => onPageSizeChange(Number(value))}
-          >
-            <SelectTrigger className="h-8 w-[74px] rounded-md border border-neutral-border bg-white px-3 py-0 text-xs font-semibold text-neutral-800 shadow-sm [&_svg]:text-[#FF6B00]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="rounded-lg border-neutral-border bg-white shadow-xl">
-              <SelectItem value="8">08</SelectItem>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-            </SelectContent>
-          </Select>
-          <span>
-            trong tổng số {String(filteredBookingsCount).padStart(2, "0")} buổi tập
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === 1}
-            onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-            className="h-7 rounded-md px-1.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950 disabled:opacity-40"
-          >
-            ‹ Trước
-          </Button>
-
-          {visiblePages.map((page, index) => {
-            if (page === "...") {
-              return (
-                <span
-                  key={`ellipsis-${index}`}
-                  className="px-1 text-[11px] font-semibold text-neutral-500"
-                >
-                  ...
-                </span>
-              );
-            }
-
-            const pageNum = page as number;
-            const isCurrent = pageNum === currentPage;
-
-            return (
-              <Button
-                key={pageNum}
-                type="button"
-                variant={isCurrent ? "default" : "ghost"}
-                size="icon-sm"
-                onClick={() => onPageChange(pageNum)}
-                className={cn(
-                  "h-7 w-7 rounded-md text-[11px] font-semibold",
-                  isCurrent
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                    : "bg-transparent text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950",
-                )}
-              >
-                {pageNum}
-              </Button>
-            );
-          })}
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={currentPage === totalPages}
-            onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-            className="h-7 rounded-md px-1.5 text-[11px] font-medium text-neutral-700 hover:bg-neutral-muted hover:text-neutral-950 disabled:opacity-40"
-          >
-            Tiếp ›
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

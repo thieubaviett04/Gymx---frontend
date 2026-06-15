@@ -136,7 +136,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-900 font-sans text-neutral-900">
       {/* Desktop Sidebar */}
-      <aside className="hidden h-full w-[260px] shrink-0 select-none flex-col border-r border-neutral-200 bg-white md:flex">
+      <aside className="hidden h-full w-[295px] shrink-0 select-none flex-col border-r border-neutral-200 bg-white md:flex">
         <div className="flex items-center justify-center gap-2 border-b border-neutral-100 p-6 text-center">
           <span className="text-2xl font-bold tracking-tight text-neutral-900">
             Gym <span className="text-[#FF6B00]">Max</span>
@@ -156,7 +156,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
       {/* Mobile Sidebar drawer */}
       <aside
         className={cn(
-          "fixed bottom-0 left-0 top-0 z-50 flex w-[260px] flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:hidden",
+          "fixed bottom-0 left-0 top-0 z-50 flex w-[295px] flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:hidden",
           isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -179,7 +179,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
       >
         <div className="absolute inset-0 z-0 bg-neutral-950/75" />
 
-        <header className="relative z-25 shrink-0 select-none border-b border-white/5 px-6 py-4">
+        <header className="relative z-20 shrink-0 select-none border-b border-white/5 px-6 py-4">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <button
@@ -264,7 +264,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
           </div>
         </header>
 
-        <div className="relative z-10 flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="relative flex-1 overflow-y-auto p-6 md:p-8">
           {children}
         </div>
       </main>
