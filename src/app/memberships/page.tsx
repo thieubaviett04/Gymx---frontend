@@ -147,7 +147,7 @@ export default function MembershipPage() {
         selectedPackage={selectedPackage}
       />
 
-      <div className="space-y-6">
+      <div className="flex min-h-full flex-col gap-2">
         <FilterBar
           durationFilter={durationFilter}
           setDurationFilter={setDurationFilter}
@@ -164,8 +164,9 @@ export default function MembershipPage() {
             }}
           />
         ) : (
-          <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-1 flex-col">
+            <div className="min-h-[500px]">
+<div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
               {currentPackages.map((item) => (
                 <PackageCard
                   key={item.id}
@@ -174,7 +175,8 @@ export default function MembershipPage() {
                   duration={item.duration}
                   price={item.price}
                   description={item.description}
-                  featured={item.id === "GT001" || item.id === "GT004"}
+                  featured={item.id === "GT001"}
+                  showDiscount={item.id === "GT001"}
                   onRegister={
                     item.id === "GT002"
                       ? handleFakeError
@@ -184,14 +186,17 @@ export default function MembershipPage() {
                         }
                   }
                   onDetail={() => {
-                    setActivePackageForDetail(item);
-                    setShowDetail(true);
-                  }}
+  setActivePackageForDetail(item);
+
+  setTimeout(() => {
+    setShowDetail(true);
+  }, 10);
+}}
                 />
               ))}
             </div>
-
-            <div className="pt-4 border-t border-white/10">
+</div>
+         <div className="pt-1 border-t border-white/10">
               <PackagePagination
                 currentPage={currentPage}
                 totalPages={totalPages}

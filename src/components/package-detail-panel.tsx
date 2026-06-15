@@ -77,7 +77,7 @@ export default function PackageDetailPanel({
       <div
         onClick={onClose}
         className={`
-          fixed inset-0 z-40
+          fixed inset-0 z-[90]
           bg-black/60 backdrop-blur-xs
           transition-opacity duration-300
           ${open ? "opacity-100" : "pointer-events-none opacity-0"}
@@ -87,7 +87,7 @@ export default function PackageDetailPanel({
       {/* Panel */}
       <div
         className={`
-          fixed right-0 top-0 z-50
+          fixed right-0 top-0 z-[100]
           h-screen w-full max-w-sm sm:w-[380px]
           bg-[#FFFDFB]
           border-l border-neutral-200
@@ -98,7 +98,7 @@ export default function PackageDetailPanel({
         `}
       >
         {/* Header */}
-        <div className="relative border-b border-neutral-100 p-5 flex-none bg-white">
+        <div className="relative border-b border-neutral-100 px-6 py-4 flex-none bg-white">
           <div
             className="
               absolute
@@ -112,14 +112,15 @@ export default function PackageDetailPanel({
           />
 
           <div className="flex items-center justify-between">
-            <h2 className="pl-4 font-bold text-neutral-800 text-base">
+            <h2 className="pl-0.5 font-bold text-neutral-800 text-[15px]">
               Chi tiết gói tập
             </h2>
 
             <button
               onClick={onClose}
               className="
-                flex h-8 w-8 items-center justify-center
+                absolute right-5 top-4
+    flex h-8 w-8 items-center justify-center
                 rounded-full
                 bg-neutral-100 hover:bg-neutral-200/60
                 text-neutral-500 hover:text-neutral-800
@@ -132,7 +133,7 @@ export default function PackageDetailPanel({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+<div className="flex-1 overflow-y-auto px-6 pt-4 pb-5 space-y-5">
           {/* Main Info */}
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-4">
