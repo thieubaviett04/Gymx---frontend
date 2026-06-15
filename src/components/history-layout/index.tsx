@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, SlidersHorizontal, X, Check } from "lucide-react";
+import { Search, SlidersHorizontal, X, Check, ChevronDown } from "lucide-react";
 import { GymDB, Booking } from "@/lib/mock-db";
 import MonthNavigation from "./month-navigation";
-import FilterPanel from "./filter-panel";
-import HistoryTable from "./history-table";
+import HistoryTable, { getVisiblePages } from "./history-table";
 import DetailsPanel from "./details-panel";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 export default function HistoryLayout() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -43,6 +51,11 @@ export default function HistoryLayout() {
 
   // Trạng thái Side Panel Bộ Lọc
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const ptRef = useRef<HTMLDivElement>(null);
+  const [isPTDropdownOpen, setIsPTDropdownOpen] = useState(false);
+  const [ptSearchQuery, setPtSearchQuery] = useState("");
+  
   const [filterService, setFilterService] = useState<string>("");
   const [filterRatingStatus, setFilterRatingStatus] = useState<string>("Tất cả");
   const [filterPT, setFilterPT] = useState<string>("Tất cả HLV");
@@ -113,7 +126,7 @@ export default function HistoryLayout() {
     }, 0);
   }, []);
 
-  // Tự động đóng Month Picker khi bấm ngoài
+  // Tự động đóng Month Picker và Bộ lọc khi bấm ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -121,6 +134,18 @@ export default function HistoryLayout() {
         !monthPickerRef.current.contains(event.target as Node)
       ) {
         setShowMonthPicker(false);
+      }
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsFilterOpen(false);
+      }
+      if (
+        ptRef.current &&
+        !ptRef.current.contains(event.target as Node)
+      ) {
+        setIsPTDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -248,15 +273,19 @@ export default function HistoryLayout() {
     });
   };
 
-  // Mở bộ lọc tạm thời
-  const handleOpenFilter = () => {
-    setTempFilterService(filterService);
-    setTempFilterRatingStatus(filterRatingStatus);
-    setTempFilterPT(filterPT);
-    setTempFilterStatusAttended(filterStatusAttended);
-    setTempFilterStatusMissed(filterStatusMissed);
-    setTempFilterStatusCancelled(filterStatusCancelled);
-    setIsFilterOpen(true);
+  // Toggle bộ lọc
+  const handleToggleFilter = () => {
+    if (isFilterOpen) {
+      setIsFilterOpen(false);
+    } else {
+      setTempFilterService(filterService);
+      setTempFilterRatingStatus(filterRatingStatus);
+      setTempFilterPT(filterPT);
+      setTempFilterStatusAttended(filterStatusAttended);
+      setTempFilterStatusMissed(filterStatusMissed);
+      setTempFilterStatusCancelled(filterStatusCancelled);
+      setIsFilterOpen(true);
+    }
   };
 
   // Áp dụng bộ lọc
@@ -302,6 +331,11 @@ export default function HistoryLayout() {
     setFilterStatusCancelled(true);
     setCurrentPage(1);
   };
+
+  const ptOptions = ["Tất cả HLV", "Nguyễn Văn A", "Lê Thị B"];
+  const filteredPTs = ptOptions.filter((pt) =>
+    pt.toLowerCase().includes(ptSearchQuery.toLowerCase())
+  );
 
   // Lọc danh sách buổi tập
   const filteredBookings = bookings.filter((b) => {
@@ -464,18 +498,206 @@ export default function HistoryLayout() {
 
         {/* Filter Trigger and Search Bar */}
         <div className="flex items-center gap-3 w-full md:w-auto flex-1 md:flex-none justify-end">
-          <button
-            onClick={handleOpenFilter}
-            className="bg-primary hover:bg-primary-dark text-primary-foreground font-bold px-4 py-2.5 rounded-lg text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-            <span>
-              Bộ lọc {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}
-            </span>
-          </button>
+          {/* Dropdown Lọc */}
+          <div className="relative" ref={filterDropdownRef}>
+            <button
+              onClick={handleToggleFilter}
+              className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 shadow-2xs cursor-pointer select-none"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-[#FF6B00]" />
+              <span>Lọc</span>
+              <ChevronDown className={cn("h-4 w-4 text-[#FF6B00] transition-transform", isFilterOpen && "rotate-180")} />
+            </button>
 
-          <div className="relative flex-1 md:w-80 md:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-mutedforeground" />
+            {isFilterOpen && (
+              <div className="absolute left-0 mt-2 z-35 w-[380px] sm:w-[420px] rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl text-neutral-800 animate-in fade-in-50 zoom-in-95 duration-150">
+                <div className="space-y-5">
+                  {/* Title with left orange line */}
+                  <div className="flex items-center mb-1">
+                    <div className="h-5 w-1 rounded-full bg-[#FF6B00] mr-2.5" />
+                    <span className="text-base font-bold text-neutral-900">Bộ lọc buổi tập</span>
+                  </div>
+
+                  {/* Dịch vụ */}
+                  <div className="space-y-3">
+                    <span className="block text-sm font-bold text-neutral-800">Dịch vụ</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: "Tất cả", value: "" },
+                        { label: "Không", value: "Không" },
+                        { label: "Gói cơ bản", value: "Gói cơ bản" },
+                        { label: "Gói nâng cao", value: "Gói nâng cao" }
+                      ].map((opt) => {
+                        const isChecked = tempFilterService === opt.value;
+                        return (
+                          <label
+                            key={opt.value}
+                            className={cn(
+                              "flex items-center justify-start gap-2.5 h-9 rounded-lg text-xs font-bold border transition cursor-pointer select-none px-3",
+                              isChecked
+                                ? "bg-[#FFF0E5] border-[#FF6B00] text-[#FF6B00]"
+                                : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                            )}
+                          >
+                            <input
+                              type="radio"
+                              name="service-filter"
+                              checked={isChecked}
+                              onChange={() => setTempFilterService(opt.value)}
+                              className="sr-only"
+                            />
+                            <div
+                              className={cn(
+                                "w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 transition",
+                                isChecked ? "border-[#FF6B00] border-2" : "border-neutral-300"
+                              )}
+                            >
+                              {isChecked && (
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B00]" />
+                              )}
+                            </div>
+                            <span>{opt.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Đánh giá */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-800">Đánh giá</label>
+                    <Select
+                      value={tempFilterRatingStatus}
+                      onValueChange={(val) => setTempFilterRatingStatus(val || "Tất cả")}
+                    >
+                      <SelectTrigger className="w-full bg-white border border-neutral-200 rounded-xl px-4 py-2.5 h-10 text-xs text-neutral-800 font-semibold outline-none focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00]">
+                        <SelectValue placeholder="Chọn trạng thái đánh giá" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-neutral-200 rounded-xl shadow-xl p-1 z-55">
+                        <SelectItem value="Tất cả">Tất cả</SelectItem>
+                        <SelectItem value="Chưa đánh giá">Chưa đánh giá</SelectItem>
+                        <SelectItem value="Đã đánh giá">Đã đánh giá</SelectItem>
+                        <SelectItem value="Quá hạn đánh giá">Quá hạn đánh giá</SelectItem>
+                        <SelectItem value="Không áp dụng">Không áp dụng</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Huấn luyện viên: Combobox */}
+                  <div className="space-y-1.5 relative" ref={ptRef}>
+                    <label className="text-xs font-bold text-neutral-800">Huấn luyện viên</label>
+                    <button
+                      type="button"
+                      onClick={() => setIsPTDropdownOpen(!isPTDropdownOpen)}
+                      className="flex w-full items-center justify-between gap-1.5 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 h-10 text-xs text-neutral-800 font-semibold outline-none transition-colors focus:border-[#FF6B00] text-left cursor-pointer"
+                    >
+                      <span>{tempFilterPT}</span>
+                      <ChevronDown className="w-4 h-4 text-neutral-400" />
+                    </button>
+                    
+                    {isPTDropdownOpen && (
+                      <div className="absolute z-55 mt-1 w-full bg-white border border-neutral-200 rounded-xl shadow-xl p-1 max-h-48 overflow-y-auto">
+                        <input
+                          type="text"
+                          placeholder="Tìm kiếm HLV..."
+                          value={ptSearchQuery}
+                          onChange={(e) => setPtSearchQuery(e.target.value)}
+                          className="w-full px-3 py-2 text-xs border-b border-neutral-100 focus:outline-none focus:border-[#FF6B00] mb-1 font-semibold text-[#0A0A0A] bg-white outline-none"
+                        />
+                        <div className="flex flex-col gap-0.5">
+                          {filteredPTs.map((pt) => {
+                            const isSelected = tempFilterPT === pt;
+                            return (
+                              <button
+                                key={pt}
+                                type="button"
+                                onClick={() => {
+                                  setTempFilterPT(pt);
+                                  setIsPTDropdownOpen(false);
+                                  setPtSearchQuery("");
+                                }}
+                                className={cn(
+                                  "flex w-full cursor-pointer items-center justify-between rounded-[6px] py-1.5 px-3 text-xs font-semibold outline-none select-none transition-colors text-left",
+                                  isSelected
+                                    ? "bg-[#FFF0E5] text-[#FF6B00]"
+                                    : "text-[#0A0A0A] hover:bg-[#F5F5F5] hover:text-[#FF6B00]"
+                                )}
+                              >
+                                <span>{pt}</span>
+                                {isSelected && <Check className="w-3.5 h-3.5 text-[#FF6B00]" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Trạng thái */}
+                  <div className="space-y-3">
+                    <span className="block text-sm font-bold text-neutral-800">Trạng thái</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: "attended", label: "Hoàn thành", checked: tempFilterStatusAttended, onChange: () => setTempFilterStatusAttended(!tempFilterStatusAttended) },
+                        { id: "missed", label: "Vắng mặt", checked: tempFilterStatusMissed, onChange: () => setTempFilterStatusMissed(!tempFilterStatusMissed) },
+                        { id: "cancelled", label: "Đã hủy", checked: tempFilterStatusCancelled, onChange: () => setTempFilterStatusCancelled(!tempFilterStatusCancelled) }
+                      ].map((opt) => {
+                        return (
+                          <div
+                            key={opt.id}
+                            onClick={opt.onChange}
+                            className={cn(
+                              "flex cursor-pointer items-center gap-2 rounded-lg border p-2 h-9 transition-all duration-200 select-none",
+                              opt.checked
+                                ? "border-[#FF6B00] bg-[#FFF0E5]/30 shadow-2xs"
+                                : "border-neutral-200 bg-white hover:bg-neutral-50"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "flex h-4 w-4 items-center justify-center rounded border transition-all duration-200 shrink-0",
+                                opt.checked
+                                  ? "border-[#FF6B00] bg-[#FF6B00] text-white"
+                                  : "border-neutral-300 bg-white"
+                              )}
+                            >
+                              {opt.checked && <Check size={10} className="stroke-[3]" />}
+                            </div>
+                            <span className="text-[11px] font-bold text-neutral-700 leading-none">{opt.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="border-t border-neutral-100 pt-4 grid grid-cols-2 gap-3 w-full">
+                    <button
+                      type="button"
+                      onClick={handleResetFilter}
+                      className="flex h-10 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-bold text-neutral-600 hover:bg-neutral-50 transition cursor-pointer"
+                    >
+                      Đặt lại
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleApplyFilter}
+                      className="flex h-10 items-center justify-center rounded-xl bg-[#FF6B00] text-sm font-bold text-white hover:bg-[#E05E00] transition cursor-pointer shadow-xs"
+                    >
+                      Áp dụng
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Search Box */}
+          <div className="relative min-w-[320px] md:min-w-[480px] flex-1">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-4 w-4 text-[#FF6B00]" />
+            </span>
             <input
               type="text"
               placeholder="Tìm kiếm theo tên huấn luyện viên, dịch vụ..."
@@ -484,7 +706,7 @@ export default function HistoryLayout() {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-9 pr-4 py-2 border border-neutral-border rounded-lg text-xs bg-neutral-background focus:outline-none focus:ring-1 focus:ring-primary text-neutral-foreground font-medium shadow-2xs"
+              className="w-full rounded-xl border border-neutral-200 bg-white py-2.5 pl-10 pr-4 text-sm text-neutral-855 placeholder-neutral-400 outline-none transition focus:border-[#FF6B00] focus:ring-1 focus:ring-[#FF6B00] shadow-2xs font-medium"
             />
           </div>
         </div>
@@ -497,37 +719,97 @@ export default function HistoryLayout() {
         selectedBooking={selectedBooking}
         isDetailsOpen={isDetailsOpen}
         startIndex={startIndex}
-        pageSize={pageSize}
-        currentPage={currentPage}
-        totalPages={totalPages}
         onSelectRow={handleSelectRow}
-        onPageSizeChange={(size) => {
-          setPageSize(size);
-          setCurrentPage(1);
-        }}
-        onPageChange={(page) => setCurrentPage(page)}
         onClearFilters={handleClearAllFilters}
+        onOpenRating={(booking) => {
+          setSelectedBooking(booking);
+          setRatingVal(5);
+          setCommentVal("");
+          setIsFormMode(true);
+          setFormValidationError("");
+          setIsDetailsOpen(true);
+        }}
       />
 
-      {/* FILTER PANEL: Slide-over filter */}
-      <FilterPanel
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        tempFilterService={tempFilterService}
-        setTempFilterService={setTempFilterService}
-        tempFilterRatingStatus={tempFilterRatingStatus}
-        setTempFilterRatingStatus={setTempFilterRatingStatus}
-        tempFilterPT={tempFilterPT}
-        setTempFilterPT={setTempFilterPT}
-        tempFilterStatusAttended={tempFilterStatusAttended}
-        setTempFilterStatusAttended={setTempFilterStatusAttended}
-        tempFilterStatusMissed={tempFilterStatusMissed}
-        setTempFilterStatusMissed={setTempFilterStatusMissed}
-        tempFilterStatusCancelled={tempFilterStatusCancelled}
-        setTempFilterStatusCancelled={setTempFilterStatusCancelled}
-        onReset={handleResetFilter}
-        onApply={handleApplyFilter}
-      />
+      {/* Footer pagination outside table card */}
+      {filteredBookings.length > 0 && (
+        <div className="mt-6 flex flex-col gap-4 font-sans text-xs text-white sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 text-neutral-200">
+            <span>Hiển thị</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value));
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="h-8 w-[74px] rounded-md border-0 bg-white px-3 py-0 text-xs font-semibold text-neutral-800 shadow-sm [&_svg]:text-[#FF6B00]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-neutral-200 bg-white shadow-xl">
+                <SelectItem value="8">08</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+              </SelectContent>
+            </Select>
+            <span>trong tổng {filteredBookings.length} buổi tập</span>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              className="h-7 rounded-md px-1.5 text-[11px] font-medium text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
+            >
+              ‹ Trước
+            </Button>
+
+            {getVisiblePages(currentPage, totalPages).map((page, index) => {
+              if (page === "...") {
+                return (
+                  <span key={`ellipsis-${index}`} className="px-1 text-[11px] font-semibold text-white/70">
+                    ...
+                  </span>
+                );
+              }
+
+              const pageNum = page as number;
+
+              return (
+                <Button
+                  key={pageNum}
+                  type="button"
+                  variant={currentPage === pageNum ? "default" : "ghost"}
+                  size="icon-sm"
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={cn(
+                    "h-7 w-7 rounded-md text-[11px] font-semibold",
+                    currentPage === pageNum
+                      ? "bg-[#FF6B00] text-white hover:bg-[#FF6B00]/90"
+                      : "bg-transparent text-white hover:bg-white/10 hover:text-white",
+                  )}
+                >
+                  {pageNum}
+                </Button>
+              );
+            })}
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className="h-7 rounded-md px-1.5 text-[11px] font-medium text-white hover:bg-white/10 hover:text-white disabled:opacity-40"
+            >
+              Tiếp ›
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* DETAIL & RATING PANEL: Slide-over details view & Rating forms */}
       {selectedBooking && (
