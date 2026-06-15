@@ -8,6 +8,7 @@ type Props = {
   price: string;
   description: string;
   featured?: boolean;
+ showDiscount?: boolean;
   onRegister?: () => void;
   onDetail?: () => void;
 };
@@ -19,13 +20,14 @@ export default function PackageCard({
   price,
   description,
   featured,
+  showDiscount,
   onRegister,
   onDetail,
 }: Props) {
   return (
     <div
       className={cn(
-        "group flex flex-col justify-between rounded-2xl border bg-white p-6 shadow-xs transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden font-sans h-full min-h-[260px]",
+        "group flex flex-col justify-between rounded-2xl border bg-white p-5 shadow-xs transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden font-sans h-full min-h-[220px]",
         featured
           ? "border-[#FF6B00] border-2 shadow-[#FF6B00]/5"
           : "border-neutral-200"
@@ -33,9 +35,9 @@ export default function PackageCard({
     >
       {/* Featured Ribbon / Badge */}
       {featured && (
-        <div className="absolute right-0 top-0 bg-gradient-to-l from-[#FF6B00] to-[#FF8833] text-white text-[10px] font-extrabold uppercase tracking-wider px-3.5 py-1.5 rounded-bl-xl shadow-xs select-none border-l border-b border-[#FF6B00]/10">
-          Phổ biến nhất
-        </div>
+<div className="absolute right-0 top-0 bg-gradient-to-l from-[#FF6B00] to-[#FF8833] text-white text-[7.5px] font-bold uppercase px-2 py-0.75 rounded-bl-md shadow-xs select-none">
+  🔥 PHỔ BIẾN NHẤT
+</div>
       )}
 
       <div className="flex-1 flex flex-col">
@@ -51,40 +53,46 @@ export default function PackageCard({
         </div>
 
         {/* Description */}
-        <p className="mb-4 text-xs leading-relaxed text-neutral-500 flex-1">
+        <p className="mb-4 text-xs leading-relaxed text-neutral-500 ">
           {description}
         </p>
 
         {/* Duration & Price Row matching design */}
-        <div className="flex items-center justify-between mb-1 font-sans">
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500">
-            <Clock3 size={14} className="text-neutral-500" />
-            <span>
-              Thời hạn: <span className="font-bold text-neutral-900">{duration}</span>
-            </span>
-          </div>
-          <div className="flex flex-col items-end">
-            {featured ? (
-              <>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className="text-[10px] text-neutral-400 line-through">500.000 VNĐ</span>
-                  <span className="rounded bg-[#FFF0E5] px-1 py-0.5 text-[9px] font-bold text-[#FF6B00] border border-[#FF6B00]/10">-50%</span>
-                </div>
-                <span className="text-lg font-extrabold text-[#FF6B00] leading-none">
-                  {price}
-                </span>
-              </>
-            ) : (
-              <span className="text-lg font-extrabold text-[#FF6B00] leading-none">
-                {price}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
+        <div className="space-y-2 font-sans">
 
+  <div className="flex items-center gap-1.5 text-xs text-neutral-500">
+    <Clock3 size={14} />
+    <span>
+      Thời hạn:
+      <span className="font-bold text-neutral-900">
+        {" "}
+        {duration}
+      </span>
+    </span>
+  </div>
+
+<div className="flex items-center justify-end gap-2">
+
+  {showDiscount && (
+    <span className="text-[10px] text-neutral-400 line-through">
+      500.000 VNĐ
+    </span>
+  )}
+
+  <span className="text-2xl font-extrabold text-[#FF6B00]">
+    {price}
+  </span>
+
+  {showDiscount && (
+    <span className="rounded bg-[#FFF0E5] px-1.5 py-0.5 text-[9px] font-bold text-[#FF6B00] border border-[#FF6B00]/10">
+      -50%
+    </span>
+  )}
+
+</div>
+</div></div>
       {/* Buttons */}
-      <div className="mt-4 grid grid-cols-[112px_minmax(0,1fr)] gap-3 border-t border-neutral-100 pt-4">
+      <div className="mt-2 grid grid-cols-[112px_minmax(0,1fr)] gap-3 border-t border-neutral-100 pt-2">
         <button
           type="button"
           onClick={onDetail}

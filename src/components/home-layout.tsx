@@ -288,7 +288,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
       >
         <div className="absolute inset-0 z-0 bg-neutral-950/75" />
 
-        <header className="relative z-25 shrink-0 select-none border-b border-white/5 px-6 py-4">
+        <header className="relative z-0 shrink-0 select-none border-b border-white/5 px-6 py-4">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <button
@@ -371,7 +371,7 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
           </div>
         </header>
 
-        <div className="relative z-10 flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="relative z-10 flex-1 overflow-y-auto px-6 pt-3 pb-6 md:px-8 md:pt-4 md:pb-8">
           {children}
         </div>
       </main>

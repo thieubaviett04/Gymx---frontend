@@ -70,7 +70,10 @@ export default function RegisterModal({
   });
 
   // Calendar states
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date(2026, 4, 28)); // default to May 2026 mimicking mockup
+const [calendarMonth, setCalendarMonth] = useState(() => {
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth(), 1);
+});
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +88,10 @@ export default function RegisterModal({
       setBenefits([]);
       setIsSuccess(false);
       setIsCalendarOpen(false);
-      setCalendarMonth(new Date(2026, 4, 28)); // default month
+     const today = new Date();
+setCalendarMonth(
+  new Date(today.getFullYear(), today.getMonth(), 1)
+);
     }, 0);
 
     return () => window.clearTimeout(resetId);
@@ -155,11 +161,13 @@ export default function RegisterModal({
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
 
-    if (selectedDate < todayDate) {
-      setDateErrorMessage("Ngày bắt đầu không hợp lệ!");
-      setShowDateError(true);
-      return;
-    }
+if (selectedDate <= todayDate) {
+  setDateErrorMessage(
+    "Ngày bắt đầu phải sau ngày hết hạn của gói cũ."
+  );
+  setShowDateError(true);
+  return;
+}
 
     handleGoToPayment();
   };
@@ -205,7 +213,7 @@ export default function RegisterModal({
 
       {/* Warning Toast */}
       {showWarning && (
-        <div className="fixed left-1/2 top-5 z-55 flex w-[320px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-amber-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="fixed left-1/2 top-5 z-55 flex w-[320px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2 shadow-xl border border-amber-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">
             !
           </div>
@@ -222,7 +230,7 @@ export default function RegisterModal({
       )}
 
       {/* Modal Dialog */}
-      <div className="fixed left-1/2 top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
+      <div className="fixed left-1/2 top-[53%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl relative text-neutral-800">
           
           {/* Close button */}
@@ -236,18 +244,18 @@ export default function RegisterModal({
           {!isSuccess ? (
             <>
               {/* Header */}
-              <div className="pr-6 mb-5">
+              <div className="pr-6 mb-3">
                 <h2 className="text-xl font-bold text-neutral-900">
                   Đăng ký gói tập
                 </h2>
-                <p className="text-xs text-neutral-450 mt-1">
+               <p className="text-xs text-neutral-450 mt-0.5">
                   Kiểm tra lại thông tin trước khi hoàn tất đăng ký
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {/* Package Card Highlight */}
-                <div className="flex items-center justify-between pb-3 border-b border-neutral-150 mb-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-150 mb-3">
                   <h3 className="font-extrabold text-neutral-900 text-base">
                     {selectedPackage?.name}
                   </h3>
@@ -257,15 +265,15 @@ export default function RegisterModal({
                 </div>
 
                 {/* Duration & Price Fields */}
-                <div className="space-y-3.5">
-                  <div className="space-y-1.5">
+                <div className="space-y-3">
+                  <div className="space-y-1">
                     <label className="text-xs font-bold text-neutral-750">
                       Thời hạn
                     </label>
                     <input
                       disabled
                       value={selectedPackage?.duration || ""}
-                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-semibold text-sm px-4 py-2.5 outline-none select-none"
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-semibold text-sm px-4 py-2 outline-none select-none"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -275,7 +283,7 @@ export default function RegisterModal({
                     <input
                       disabled
                       value={selectedPackage?.price ? selectedPackage.price.replace(" VNĐ", "") : ""}
-                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-semibold text-sm px-4 py-2.5 outline-none select-none"
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-500 font-semibold text-sm px-4 py-2 outline-none select-none"
                     />
                   </div>
                 </div>
@@ -397,13 +405,13 @@ export default function RegisterModal({
                     <input
                       disabled
                       value={endDate || "Chờ ngày bắt đầu"}
-                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-400 font-semibold text-sm px-4 py-2.5 h-10 outline-none select-none"
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-400 font-normal text-sm px-4 py-2 h-10 outline-none select-none"
                     />
                   </div>
                 </div>
 
                 {/* Add-on Benefits */}
-                <div className="space-y-3 pt-1">
+                <div className="space-y-2 pt-0">
                   <label className="text-xs font-bold text-neutral-750">
                     Quyền lợi
                   </label>
@@ -420,7 +428,7 @@ export default function RegisterModal({
                           key={opt.id}
                           onClick={() => toggleBenefit(opt.id)}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3.5 rounded-xl border p-3.5 transition-all duration-200 select-none",
+                            "flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 transition-all duration-200 select-none",
                             isChecked
                               ? "border-[#FF6B00] bg-[#FFF0E5]/30 shadow-2xs"
                               : "border-neutral-200 bg-white hover:bg-neutral-50 hover:border-neutral-355"
@@ -455,11 +463,11 @@ export default function RegisterModal({
                     </span>
                   </div>
 
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-end gap-3">
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="rounded-xl border border-neutral-200 bg-white px-10 py-2.5 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-50 cursor-pointer select-none"
+                      className="rounded-xl border border-neutral-200 bg-white px-10 py-2 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-50 cursor-pointer select-none"
                     >
                       Hủy
                     </button>
