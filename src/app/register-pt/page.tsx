@@ -268,7 +268,7 @@ const MOCK_TRAINERS: Trainer[] = [
     rating: 5.0,
     category: "Boxing",
     price: 200000,
-    avatar: "https://images.unsplash.com/photo-1491756906566-7120ecb3192f?auto=format&fit=crop&w=150&q=80",
+   avatar: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?auto=format&fit=crop&w=150&q=80",
     services: ["Kickboxing", "Kỹ thuật đấm nâng cao", "Thể lực võ sĩ"],
     bio: "Cựu vận động viên boxing quốc gia. Hướng dẫn trực tiếp các kỹ thuật thi đấu chuẩn xác và rèn luyện tinh thần thép.",
     reviewsCount: 12,
@@ -293,16 +293,22 @@ const TIME_SLOTS = [
 
 const SERVICES_OPTIONS = [
   {
+    id: "khong",
+    name: "Không thêm dịch vụ nào",
+    price: 0,
+    description: "Chỉ tập với huấn luyện viên theo giờ"
+  },
+  {
     id: "co_ban",
-    name: "Tăng cơ cơ bản",
+    name: "Gói cơ bản",
     price: 150000,
-    description: "1 buổi/tháng với chuyên gia dinh dưỡng"
+    description: "Lộ trình tập cá nhân hóa."
   },
   {
     id: "chuyen_sau",
-    name: "Tăng cơ chuyên sâu",
-    price: 220000,
-    description: "Tập trung vào kỹ thuật và giáo án hypertrophy"
+    name: "Gói chuyên sâu",
+    price: 320000,
+    description: "Lộ trình tập + Dinh dưỡng + Kiểm tra sức khỏe + Theo dõi tuần."
   }
 ];
 
@@ -444,36 +450,76 @@ export default function RegisterPTPage() {
   };
 
   // Filter trainers
+  // Filter trainers
   const filteredTrainers = useMemo(() => {
     return MOCK_TRAINERS.filter((t) => {
+      // 1. Lọc theo thanh tìm kiếm (Không phân biệt hoa thường)
       const matchSearch =
+        searchQuery.trim() === "" ||
         t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         t.category.toLowerCase().includes(searchQuery.toLowerCase());
       
+      // 2. Lọc theo giới tính
       const matchGender =
-        selectedGender === "Tất cả giới tính" ||
-        (selectedGender === "Nam" && t.gender === "Nam") ||
-        (selectedGender === "Nữ" && t.gender === "Nữ");
+        selectedGender === "Tất cả giới tính" || t.gender === selectedGender;
 
+      // 3. Lọc theo số sao đánh giá
       const matchRating =
-        selectedRating === null ||
-        (selectedRating === 5 && t.rating >= 5.0) ||
-        (selectedRating === 4 && t.rating >= 4.0) ||
-        (selectedRating === 3 && t.rating >= 3.0);
+        selectedRating === null || t.rating >= selectedRating;
 
+      // 4. Lọc theo chuyên môn thông minh (Sửa lỗi mất HLV ở đây)
       const matchSpecialty =
         selectedCategories.length === 0 ||
         selectedCategories.some((cat) => {
-          if (cat === "Gym tổng hợp") return t.category === "Gym tổng hợp";
-          if (cat === "Tăng cơ") return t.category === "Gym tổng hợp" || t.services.some(s => s.includes("Tăng cơ"));
-          if (cat === "Giảm cân") return t.services.some(s => s.includes("Giảm cân") || s.includes("giảm mỡ"));
-          if (cat === "Cardio") return t.category === "Cardio - Aerobic" || t.services.some(s => s.includes("Cardio") || s.includes("Aerobic"));
-          return false;
+          const categoryLower = t.category?.toLowerCase() || "";
+          const servicesLower = t.services?.map(s => s.toLowerCase()) || [];
+
+          switch (cat) {
+            case "Gym tổng hợp":
+              return categoryLower.includes("gym") || categoryLower.includes("thể hình");
+
+            case "Tăng cơ":
+              return categoryLower.includes("gym") || servicesLower.some(s => s.includes("tăng cơ") || s.includes("cơ bắp") || s.includes("phát triển cơ"));
+
+            case "Giảm cân":
+              return categoryLower.includes("giảm") || servicesLower.some(s => s.includes("giảm cân") || s.includes("giảm mỡ") || s.includes("đốt mỡ") || s.includes("giảm béo"));
+
+            case "Cardio":
+              return categoryLower.includes("cardio") || categoryLower.includes("aerobic") || 
+                     servicesLower.some(s => s.includes("cardio") || s.includes("aerobic"));
+
+            case "Yoga":
+              return categoryLower.includes("yoga") || servicesLower.some(s => s.includes("yoga"));
+
+            case "Pilates":
+              return categoryLower.includes("pilates") || servicesLower.some(s => s.includes("pilates"));
+
+            case "Boxing":
+              return categoryLower.includes("boxing") || categoryLower.includes("võ") || 
+                     servicesLower.some(s => s.includes("boxing") || s.includes("kickboxing") || s.includes("đối kháng"));
+
+            case "Phục hồi":
+              return categoryLower.includes("phục hồi") || categoryLower.includes("trị liệu") || 
+                     servicesLower.some(s => s.includes("phục hồi") || s.includes("trị liệu") || s.includes("xương khớp"));
+
+            case "Calisthenics":
+              return categoryLower.includes("calisthenics") || 
+                     servicesLower.some(s => s.includes("calisthenics") || s.includes("bodyweight"));
+
+            case "Powerlifting":
+              return categoryLower.includes("powerlifting") || 
+                     servicesLower.some(s => s.includes("powerlifting") || s.includes("tạ nặng"));
+
+            default:
+              const catLower = cat.toLowerCase();
+              return categoryLower.includes(catLower) || servicesLower.some(s => s.includes(catLower));
+          }
         });
 
       return matchSearch && matchGender && matchRating && matchSpecialty;
     }).sort((a, b) => b.rating - a.rating);
   }, [searchQuery, selectedGender, selectedRating, selectedCategories]);
+
 
   // Paginated trainers
   const paginatedTrainers = useMemo(() => {
@@ -506,17 +552,17 @@ export default function RegisterPTPage() {
     const subtotal = durationCost + servicesCost;
 
     // Discount if 2 or more services are selected
-    let discount = 0;
+    /* let discount = 0;
     if (selectedServices.length >= 2) {
       discount = subtotal * 0.1; // 10% discount
-    }
+    } */
 
-    const total = subtotal - discount;
+    const total = subtotal //- discount;
 
     return {
       durationCost,
       servicesCost,
-      discount,
+      //discount,
       total
     };
   }, [selectedTrainer, bookingDuration, selectedServices]);
@@ -537,11 +583,8 @@ export default function RegisterPTPage() {
   }, [selectedTimeSlot, bookingDuration]);
 
   const toggleService = (serviceId: string) => {
-    setSelectedServices((prev) =>
-      prev.includes(serviceId)
-        ? prev.filter((id) => id !== serviceId)
-        : [...prev, serviceId]
-    );
+    // Ép mảng chỉ giữ duy nhất một gói được chọn thay vì thêm/bớt nhiều gói như cũ
+    setSelectedServices([serviceId]);
   };
 
   const handleBookingSubmit = () => {
@@ -669,193 +712,197 @@ export default function RegisterPTPage() {
                   </button>
 
                   {/* Dropdown panel matching user's custom filter design */}
-                  {isFilterDropdownOpen && (
-                    <div className="absolute left-0 mt-2 z-35 w-[360px] rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl text-neutral-800 animate-in fade-in-50 zoom-in-95 duration-150">
-                      <div className="space-y-5">
-                        
-                        {/* Title with left orange line */}
-                        <div className="flex items-center mb-1">
-                          <div className="h-5 w-1 rounded-full bg-[#FF6B00] mr-2.5" />
-                          <span className="text-base font-bold text-neutral-900">Bộ lọc huấn luyện viên</span>
-                        </div>
+{isFilterDropdownOpen && (
+  /* TĂNG CHIỀU RỘNG: Thay w-[360px] thành w-[400px] để panel rộng rãi hơn */
+  <div className="absolute left-0 mt-2 z-35 w-[400px] rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl text-neutral-800 animate-in fade-in-50 zoom-in-95 duration-150">
+    <div className="space-y-5">
+      
+      {/* Title with left orange line */}
+      <div className="flex items-center mb-1">
+        <div className="h-5 w-1 rounded-full bg-[#FF6B00] mr-2.5" />
+        <span className="text-base font-bold text-neutral-900">Bộ lọc huấn luyện viên</span>
+      </div>
 
-                        {/* Giới tính */}
-                        <div className="space-y-3">
-                          <span className="block text-sm font-bold text-neutral-800">Giới tính</span>
-                          <div className="flex items-center gap-6">
-                            {[
-                              { label: "Nam", value: "Nam" },
-                              { label: "Nữ", value: "Nữ" },
-                              { label: "Tất cả", value: "Tất cả giới tính" }
-                            ].map((opt) => {
-                              const isChecked = tempGender === opt.value;
-                              return (
-                                <label
-                                  key={opt.value}
-                                  className="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer font-medium select-none"
-                                >
-                                  <input
-                                    type="radio"
-                                    name="gender"
-                                    value={opt.value}
-                                    checked={isChecked}
-                                    onChange={() => setTempGender(opt.value)}
-                                    className="sr-only"
-                                  />
-                                  <div
-                                    className={cn(
-                                      "w-5 h-5 rounded-full border flex items-center justify-center transition",
-                                      isChecked
-                                        ? "border-[#FF6B00] border-2"
-                                        : "border-neutral-300"
-                                    )}
-                                  >
-                                    {isChecked && (
-                                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
-                                    )}
-                                  </div>
-                                  <span>{opt.label}</span>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Đánh giá */}
-                        <div className="space-y-3">
-                          <span className="block text-sm font-bold text-neutral-800">Đánh giá</span>
-                          <div className="flex flex-wrap items-center gap-2">
-                            {[
-                              { label: "Từ 3 sao", value: 3 },
-                              { label: "Từ 4 sao", value: 4 },
-                              { label: "5 sao", value: 5 },
-                              { label: "Tất cả", value: null }
-                            ].map((opt) => {
-                              const isSelected = tempRating === opt.value;
-                              return (
-                                <button
-                                  key={opt.label}
-                                  type="button"
-                                  onClick={() => setTempRating(opt.value)}
-                                  className={cn(
-                                    "flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-xs font-semibold border transition cursor-pointer select-none",
-                                    isSelected
-                                      ? "bg-[#FFF0E5] border-[#FF6B00] text-[#FF6B00]"
-                                      : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
-                                  )}
-                                >
-                                  {opt.value !== null && (
-                                    <Star className={cn("h-3.5 w-3.5", isSelected ? "fill-amber-400 text-amber-400" : "fill-neutral-400 text-neutral-400")} />
-                                  )}
-                                  <span>{opt.label}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Chuyên môn */}
-                        <div className="space-y-3">
-                          <span className="block text-sm font-bold text-neutral-800">Chuyên môn</span>
-                          <div className="grid grid-cols-2 gap-3">
-                            <label
-                              className="flex items-center justify-between bg-white border border-neutral-200 p-2.5 rounded-lg text-xs text-neutral-700 cursor-pointer font-medium hover:border-neutral-300 transition select-none"
-                            >
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={tempCategories.length === 0}
-                                  onChange={() => {
-                                    setTempCategories([]);
-                                  }}
-                                  className="sr-only"
-                                />
-                                <div
-                                  className={cn(
-                                    "w-4 h-4 rounded border flex items-center justify-center transition",
-                                    tempCategories.length === 0
-                                      ? "border-[#FF6B00] bg-[#FF6B00]/10"
-                                      : "border-neutral-300"
-                                  )}
-                                >
-                                  {tempCategories.length === 0 && (
-                                    <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
-                                  )}
-                                </div>
-                                <span>Tất cả</span>
-                              </div>
-                            </label>
-
-                            {["Gym tổng hợp", "Tăng cơ", "Giảm cân", "Cardio"].map((cat) => {
-                              const isChecked = tempCategories.includes(cat);
-                              return (
-                                <label
-                                  key={cat}
-                                  className="flex items-center justify-between bg-white border border-neutral-200 p-2.5 rounded-lg text-xs text-neutral-700 cursor-pointer font-medium hover:border-neutral-300 transition select-none"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <input
-                                      type="checkbox"
-                                      checked={isChecked}
-                                      onChange={() => {
-                                        setTempCategories((prev) =>
-                                          prev.includes(cat)
-                                            ? prev.filter((c) => c !== cat)
-                                            : [...prev, cat]
-                                        );
-                                      }}
-                                      className="sr-only"
-                                    />
-                                    <div
-                                      className={cn(
-                                        "w-4 h-4 rounded border flex items-center justify-center transition",
-                                        isChecked
-                                          ? "border-[#FF6B00] bg-[#FF6B00]/10"
-                                          : "border-neutral-300"
-                                      )}
-                                    >
-                                      {isChecked && (
-                                        <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
-                                      )}
-                                    </div>
-                                    <span>{cat}</span>
-                                  </div>
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="border-t border-neutral-100 pt-4 flex justify-end gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTempGender("Tất cả giới tính");
-                              setTempRating(null);
-                              setTempCategories([]);
-                            }}
-                            className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold px-4 py-2 rounded-lg text-xs cursor-pointer transition"
-                          >
-                            Đặt lại
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedGender(tempGender);
-                              setSelectedRating(tempRating);
-                              setSelectedCategories(tempCategories);
-                              setCurrentPage(1);
-                              setIsFilterDropdownOpen(false);
-                            }}
-                            className="bg-[#FF6B00] hover:bg-[#CC5500] text-white font-bold px-4 py-2 rounded-lg text-xs cursor-pointer transition"
-                          >
-                            Áp dụng
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+      {/* Giới tính */}
+      <div className="space-y-3">
+        <span className="block text-sm font-bold text-neutral-800">Giới tính</span>
+        <div className="flex items-center gap-6">
+          {[
+            { label: "Nam", value: "Nam" },
+            { label: "Nữ", value: "Nữ" },
+            { label: "Tất cả", value: "Tất cả giới tính" }
+          ].map((opt) => {
+            const isChecked = tempGender === opt.value;
+            return (
+              <label
+                key={opt.value}
+                className="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer font-medium select-none"
+              >
+                <input
+                  type="radio"
+                  name="gender"
+                  value={opt.value}
+                  checked={isChecked}
+                  onChange={() => setTempGender(opt.value)}
+                  className="sr-only"
+                />
+                <div
+                  className={cn(
+                    "w-5 h-5 rounded-full border flex items-center justify-center transition",
+                    isChecked
+                      ? "border-[#FF6B00] border-2"
+                      : "border-neutral-300"
                   )}
+                >
+                  {isChecked && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
+                  )}
+                </div>
+                <span>{opt.label}</span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Đánh giá */}
+      <div className="space-y-3">
+        <span className="block text-sm font-bold text-neutral-800">Đánh giá</span>
+        {/* SỬA TẠI ĐÂY: Dùng grid-cols-4 giúp 4 nút luôn nằm ngay ngắn trên ĐÚNG 1 HÀNG */}
+        <div className="grid grid-cols-4 gap-1.5">
+          {[
+            { label: "Từ 3 sao", value: 3 },
+            { label: "Từ 4 sao", value: 4 },
+            { label: "5 sao", value: 5 },
+            { label: "Tất cả", value: null }
+          ].map((opt) => {
+            const isSelected = tempRating === opt.value;
+            return (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setTempRating(opt.value)}
+                className={cn(
+                  "flex items-center justify-center gap-0.5 h-8 rounded-lg text-[11px] font-bold border transition cursor-pointer select-none px-1",
+                  isSelected
+                    ? "bg-[#FFF0E5] border-[#FF6B00] text-[#FF6B00]"
+                    : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                )}
+              >
+                {opt.value !== null && (
+                  <Star className={cn("h-3 w-3 shrink-0", isSelected ? "fill-amber-400 text-amber-400" : "fill-neutral-400 text-neutral-400")} />
+                )}
+                <span>{opt.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Chuyên môn */}
+      <div className="space-y-3">
+        <span className="block text-sm font-bold text-neutral-800">Chuyên môn (Chọn một hoặc nhiều)</span>
+        <div className="grid grid-cols-2 gap-3">
+          <label
+            className="flex items-center justify-between bg-white border border-neutral-200 p-2.5 rounded-lg text-xs text-neutral-700 cursor-pointer font-medium hover:border-neutral-300 transition select-none"
+          >
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={tempCategories.length === 0}
+                onChange={() => {
+                  setTempCategories([]);
+                }}
+                className="sr-only"
+              />
+              <div
+                className={cn(
+                  "w-4 h-4 rounded border flex items-center justify-center transition",
+                  tempCategories.length === 0
+                    ? "border-[#FF6B00] bg-[#FF6B00]/10"
+                    : "border-neutral-300"
+                )}
+              >
+                {tempCategories.length === 0 && (
+                  <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
+                )}
+              </div>
+              <span>Tất cả</span>
+            </div>
+          </label>
+
+          {["Gym tổng hợp", "Tăng cơ", "Giảm cân", "Cardio", "Yoga", "Pilates","Calisthenics", "Powerlifting","Boxing","Phục hồi"].map((cat) => {
+            const isChecked = tempCategories.includes(cat);
+            return (
+              <label
+                key={cat}
+                className="flex items-center justify-between bg-white border border-neutral-200 p-2.5 rounded-lg text-xs text-neutral-700 cursor-pointer font-medium hover:border-neutral-300 transition select-none"
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {
+                      setTempCategories((prev) =>
+                        prev.includes(cat)
+                          ? prev.filter((c) => c !== cat)
+                          : [...prev, cat]
+                      );
+                    }}
+                    className="sr-only"
+                  />
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center transition",
+                      isChecked
+                        ? "border-[#FF6B00] bg-[#FF6B00]/10"
+                        : "border-neutral-300"
+                    )}
+                  >
+                    {isChecked && (
+                      <Check className="h-3 w-3 text-[#FF6B00] stroke-[3]" />
+                    )}
+                  </div>
+                  <span>{cat}</span>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Actions */}
+      {/* SỬA TẠI ĐÂY: Biến đổi thành grid-cols-2 trải đều w-full giúp hai nút ở chính giữa dưới cùng và bằng size nhau chằn chặn */}
+      <div className="border-t border-neutral-100 pt-4 grid grid-cols-2 gap-3 w-full">
+        <button
+          type="button"
+          onClick={() => {
+            setTempGender("Tất cả giới tính");
+            setTempRating(null);
+            setTempCategories([]);
+          }}
+          className="flex h-10 items-center justify-center rounded-xl border border-neutral-200 bg-white text-sm font-bold text-neutral-600 hover:bg-neutral-50 transition cursor-pointer"
+        >
+          Đặt lại
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            // Đồng bộ toàn bộ state tạm thời sang state lọc chính thức
+            setSelectedGender(tempGender);
+            setSelectedRating(tempRating);
+            setSelectedCategories(tempCategories);
+            setCurrentPage(1); // Reset về trang 1 khi lọc
+            setIsFilterDropdownOpen(false); // Đóng bản lọc
+          }}
+          className="flex h-10 items-center justify-center rounded-xl bg-[#FF6B00] text-sm font-bold text-white hover:bg-[#E05E00] transition cursor-pointer shadow-xs"
+        >
+          Áp dụng
+        </button>
+      </div>
+    </div>
+  </div>
+)}
                 </div>
 
                 {/* Search Bar */}
@@ -981,20 +1028,23 @@ export default function RegisterPTPage() {
                         <span className="text-xs text-neutral-505">/giờ</span>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 justify-end ml-auto">
                         <button
                           onClick={() => handleOpenDetailDrawer(trainer)}
-                          className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-2 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900"
+                          // Đặt cứng độ rộng w-[90px], giảm padding py-1.5, text-xs cho nhỏ gọn
+                          className="w-[90px] h-8 rounded-lg border border-neutral-200 bg-neutral-50 text-[11px] font-bold text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900 text-center cursor-pointer"
                         >
                           Xem chi tiết
                         </button>
                         <button
                           onClick={() => handleTrainerSelect(trainer)}
-                          className="rounded-xl bg-[#FF6B00] px-6 py-2 text-xs font-bold text-white transition hover:bg-[#CC5500] min-w-[80px]"
+                          // Đồng bộ kích thước w-[90px] và h-8 như nút bên cạnh
+                          className="w-[90px] h-8 rounded-lg bg-[#FF6B00] text-[11px] font-bold text-white transition hover:bg-[#CC5500] text-center cursor-pointer"
                         >
                           Chọn
                         </button>
                       </div>
+                      
                     </div>
 
                   </div>
@@ -1379,22 +1429,26 @@ export default function RegisterPTPage() {
                       </div>
 
                       {selectedServices.map((serviceId) => {
-                        const srv = SERVICES_OPTIONS.find((s) => s.id === serviceId);
-                        if (!srv) return null;
-                        return (
-                          <div key={serviceId} className="flex justify-between text-sm">
-                            <span className="text-neutral-555">{srv.name}</span>
-                            <span className="font-medium text-[#FF6B00]">+{formatMoney(srv.price)}</span>
-                          </div>
-                        );
-                      })}
+  // Nếu chọn "Không thêm dịch vụ nào" thì ẩn đi, không hiển thị ở hóa đơn
+  if (serviceId === "khong") return null;
 
+  const srv = SERVICES_OPTIONS.find((s) => s.id === serviceId);
+  if (!srv) return null;
+  
+  return (
+    <div key={serviceId} className="flex justify-between text-sm">
+      <span className="text-neutral-600">{srv.name}</span>
+      <span className="font-medium text-[#FF6B00]">+{formatMoney(srv.price)}</span>
+    </div>
+  );
+})}
+{/* 
                       {billSummary.discount > 0 && (
                         <div className="flex justify-between text-sm bg-emerald-50 border border-emerald-100 rounded-lg p-2">
                           <span className="text-emerald-600 font-medium">Khuyến mãi Combo (Giảm 10%)</span>
                           <span className="font-bold text-emerald-600">-{formatMoney(billSummary.discount)}</span>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
 
@@ -1412,11 +1466,12 @@ export default function RegisterPTPage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="mt-6 grid grid-cols-2 gap-3 w-full">
                       <button
                         type="button"
                         onClick={() => setStep("list")}
-                        className="col-span-1 rounded-xl border border-[#D5D5D5] bg-neutral-50 py-3 text-sm font-bold text-neutral-705 transition hover:bg-neutral-100 hover:text-neutral-900"
+                        // Đồng bộ hoàn toàn class với nút "Quay lại" của footer
+                        className="w-full h-11 rounded-xl border border-neutral-200 bg-neutral-50 text-sm font-bold text-neutral-700 transition hover:bg-neutral-100 flex items-center justify-center cursor-pointer"
                       >
                         Quay lại
                       </button>
@@ -1424,7 +1479,8 @@ export default function RegisterPTPage() {
                         type="button"
                         disabled={!selectedTimeSlot}
                         onClick={() => setIsConfirmModalOpen(true)}
-                        className="col-span-2 rounded-xl bg-[#FF6B00] py-3 text-sm font-bold text-white transition hover:bg-[#CC5500] disabled:opacity-40 disabled:hover:bg-[#FF6B00] disabled:cursor-not-allowed text-center shadow-lg shadow-[#FF6B00]/10"
+                        // Đồng bộ h-11, màu cam, đổ bóng, bổ sung các thuộc tính disabled để mượt mà khi chưa chọn ca
+                        className="w-full h-11 rounded-xl bg-[#FF6B00] text-sm font-bold text-white transition hover:bg-[#CC5500] shadow-md shadow-[#FF6B00]/10 flex items-center justify-center cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF6B00]"
                       >
                         Đặt lịch
                       </button>
@@ -1445,18 +1501,17 @@ export default function RegisterPTPage() {
                     <div className="h-4 w-1 rounded-full bg-[#FF6B00] mr-2.5" />
                     <h3 className="text-sm font-bold text-[#222222]">Dịch vụ</h3>
                   </div>
-                  <span className="text-[11px] text-[#FF6B00] bg-[#FFF0E5] px-2 py-0.5 rounded border border-[#FF6B00]/10 font-semibold w-fit">
-                    Chọn từ 02 dịch vụ trở lên để được giảm 10% tổng hóa đơn
-                  </span>
+                  
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {SERVICES_OPTIONS.map((srv) => {
+                    // Cũ là .includes(), giờ chỉ chọn 1 nên so sánh bằng luôn cho chuẩn
                     const isChecked = selectedServices.includes(srv.id);
                     return (
                       <div
                         key={srv.id}
-                        onClick={() => toggleService(srv.id)}
+                        onClick={() => toggleService(srv.id)} // Gọi hàm ép chọn 1
                         className={cn(
                           "group flex cursor-pointer items-start justify-between rounded-xl border transition duration-200 p-4",
                           isChecked
@@ -1471,22 +1526,25 @@ export default function RegisterPTPage() {
                           )}>
                             {srv.name}
                           </h4>
-                          <p className="text-xs text-neutral-505 leading-relaxed">
+                          <p className="text-xs text-neutral-500 leading-relaxed">
                             {srv.description}
                           </p>
                         </div>
 
                         <div className="flex flex-col items-end justify-between h-full min-h-[48px] pl-3 shrink-0">
-                          {/* Checkbox circle indicator */}
+                          {/* SỬA TẠI ĐÂY: Biến đổi giao diện từ Checkbox thành vòng tròn Radio */}
                           <div
                             className={cn(
                               "flex h-5 w-5 items-center justify-center rounded-full border transition",
                               isChecked
-                                ? "border-[#FF6B00] bg-[#FF6B00] text-white"
+                                ? "border-[#FF6B00] bg-[#FF6B00]"
                                 : "border-neutral-300 bg-white"
                             )}
                           >
-                            {isChecked && <Check className="h-3.5 w-3.5 stroke-[3]" />}
+                            {/* Nếu được chọn, hiển thị một chấm trắng nhỏ ở tâm (Chuẩn UI Radio button) */}
+                            {isChecked && (
+                              <div className="h-2 w-2 rounded-full bg-white" />
+                            )}
                           </div>
                           <span className="text-xs font-extrabold text-[#FF6B00] mt-auto">
                             +{formatMoney(srv.price)}
@@ -1677,39 +1735,66 @@ export default function RegisterPTPage() {
                 <p className="text-xs text-neutral-505">Kiểm tra lại thông tin trước khi hoàn tất đăng ký</p>
               </div>
 
-              {/* Booking Summary Box */}
-              <div className="mt-5 space-y-3 text-sm border border-neutral-100 rounded-xl bg-neutral-50 p-4">
-                <div className="flex justify-between">
-                  <span className="text-neutral-550">Huấn luyện viên</span>
-                  <span className="font-bold text-neutral-800">{selectedTrainer.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-550">Ngày tập</span>
-                  <span className="font-semibold text-neutral-800">
-                    {bookingDate ? bookingDate.split("-").reverse().join("/") : "--/--/----"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-550">Khung giờ</span>
-                  <span className="font-semibold text-neutral-800">{selectedTimeSlot}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-555">Thời lượng</span>
-                  <span className="font-semibold text-neutral-800">{bookingDuration}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-550">Giờ kết thúc</span>
-                  <span className="font-semibold text-neutral-800">{endTime}</span>
-                </div>
-              </div>
+              {/* Booking Summary Box (Đổi bg-neutral-50 thành border/padding trực tiếp để các chữ không bị thụt lề vào trong) */}
+<div className="mt-5 space-y-4 text-sm">
+  
+  {/* Nhóm thông tin chi tiết: Đặt chung w-40 shrink-0 cho TẤT CẢ các dòng để thẳng hàng tăm tắp */}
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Huấn luyện viên</span>
+    <span className="font-bold text-neutral-800 flex-1 text-right">{selectedTrainer.name}</span>
+  </div>
+  
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Ngày tập</span>
+    <span className="font-semibold text-neutral-800 flex-1 text-right">
+      {bookingDate ? bookingDate.split("-").reverse().join("/") : "--/--/----"}
+    </span>
+  </div>
+  
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Khung giờ</span>
+    <span className="font-semibold text-neutral-800 flex-1 text-right">{selectedTimeSlot}</span>
+  </div>
+  
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Thời lượng</span>
+    <span className="font-semibold text-neutral-800 flex-1 text-right">{bookingDuration}</span>
+  </div>
+  
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Giờ kết thúc</span>
+    <span className="font-semibold text-neutral-800 flex-1 text-right">{endTime}</span>
+  </div>
 
-              {/* Total Pay details */}
-              <div className="mt-5 pt-4 border-t border-dashed border-neutral-100 flex items-center justify-between">
-                <span className="text-sm text-neutral-500">Tổng thanh toán</span>
-                <span className="text-xl font-extrabold text-[#FF6B00]">
-                  {formatMoney(billSummary.total)}
-                </span>
-              </div>
+  {/* Phần giá cả bên dưới (Giữ nguyên khoảng cách dòng space-y-4 và w-40 nên tự động thẳng hàng với cụm trên) */}
+  <div className="flex items-center">
+    <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">Giá buổi tập ({bookingDuration})</span>
+    <span className="font-semibold text-neutral-800 flex-1 text-right">{formatMoney(billSummary.durationCost)}</span>
+  </div>
+
+  {selectedServices.map((serviceId) => {
+    if (serviceId === "khong") return null;
+
+    const srv = SERVICES_OPTIONS.find((s) => s.id === serviceId);
+    if (!srv) return null;
+    
+    return (
+      <div key={serviceId} className="flex items-center">
+        <span className="text-neutral-750 w-40 shrink-0 text-left font-medium">{srv.name}</span>
+        {/* Đổi text-[#FF6B00] (cam) thành text-neutral-800 (đen) để đồng bộ với giá buổi tập */}
+        <span className="font-semibold text-neutral-800 flex-1 text-right">+{formatMoney(srv.price)}</span>
+      </div>
+    );
+  })}
+</div>
+
+{/* Total Pay details (Giữ nguyên vị trí cũ không bị ảnh hưởng bởi w-40) */}
+<div className="mt-5 pt-4 border-t border-dashed border-neutral-200 flex items-center justify-between">
+  <span className="text-sm font-semibold text-neutral-700">Tổng thanh toán</span>
+  <span className="text-xl font-extrabold text-[#FF6B00]">
+    {formatMoney(billSummary.total)}
+  </span>
+</div>
 
               {/* Footer action buttons */}
               <div className="mt-6 grid grid-cols-2 gap-3">
