@@ -293,12 +293,6 @@ const TIME_SLOTS = [
 
 const SERVICES_OPTIONS = [
   {
-    id: "khong",
-    name: "Không thêm dịch vụ nào",
-    price: 0,
-    description: "Chỉ tập với huấn luyện viên theo giờ"
-  },
-  {
     id: "co_ban",
     name: "Gói cơ bản",
     price: 150000,
@@ -387,6 +381,29 @@ export default function RegisterPTPage() {
   const [tempRating, setTempRating] = useState<number | null>(null);
   const [tempCategories, setTempCategories] = useState<string[]>([]);
 
+
+  // 1. Khai báo ref để định vị hộp thoại bộ lọc
+const filterDropdownRef = React.useRef<HTMLDivElement>(null);
+
+// 2. Lắng nghe sự kiện click toàn cục
+React.useEffect(() => {
+  function handleClickOutside(event: MouseEvent) {
+    // Nếu hộp thoại đang mở và vị trí click nằm NGOÀI hộp thoại
+    if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+      
+      // Kiểm tra tránh xung đột nếu user click trúng nút "Lọc" chính để mở panel
+      const target = event.target as HTMLElement;
+      if (!target.closest("button")?.innerHTML.includes("Lọc")) {
+        setIsFilterDropdownOpen(false);
+      }
+    }
+  }
+
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [setIsFilterDropdownOpen]);
   // Synchronize temp filters with active filters when opening
   const handleOpenDropdown = () => {
     setTempGender(selectedGender);
@@ -713,8 +730,11 @@ export default function RegisterPTPage() {
 
                   {/* Dropdown panel matching user's custom filter design */}
 {isFilterDropdownOpen && (
-  /* TĂNG CHIỀU RỘNG: Thay w-[360px] thành w-[400px] để panel rộng rãi hơn */
-  <div className="absolute left-0 mt-2 z-35 w-[400px] rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl text-neutral-800 animate-in fade-in-50 zoom-in-95 duration-150">
+  /* NỚI RỘNG TỐI ĐA: Tăng lên w-[480px] giúp các nút thoải mái không gian, không bị dính sát */
+  <div 
+    ref={filterDropdownRef}
+    className="absolute left-0 mt-2 z-35 w-[480px] rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl text-neutral-800 animate-in fade-in-50 zoom-in-95 duration-150"
+  >
     <div className="space-y-5">
       
       {/* Title with left orange line */}
@@ -726,7 +746,7 @@ export default function RegisterPTPage() {
       {/* Giới tính */}
       <div className="space-y-3">
         <span className="block text-sm font-bold text-neutral-800">Giới tính</span>
-        <div className="flex items-center gap-6">
+        <div className="grid grid-cols-3 gap-2">
           {[
             { label: "Nam", value: "Nam" },
             { label: "Nữ", value: "Nữ" },
@@ -736,7 +756,13 @@ export default function RegisterPTPage() {
             return (
               <label
                 key={opt.value}
-                className="flex items-center gap-2 text-sm text-neutral-700 cursor-pointer font-medium select-none"
+                className={cn(
+                  /* SỬA TẠI ĐÂY: Thay justify-center bằng justify-start và thêm px-3 để căn lề trái */
+                  "flex items-center justify-start gap-2.5 h-9 rounded-lg text-xs font-bold border transition cursor-pointer select-none px-3",
+                  isChecked
+                    ? "bg-[#FFF0E5] border-[#FF6B00] text-[#FF6B00]"
+                    : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+                )}
               >
                 <input
                   type="radio"
@@ -748,14 +774,12 @@ export default function RegisterPTPage() {
                 />
                 <div
                   className={cn(
-                    "w-5 h-5 rounded-full border flex items-center justify-center transition",
-                    isChecked
-                      ? "border-[#FF6B00] border-2"
-                      : "border-neutral-300"
+                    "w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 transition",
+                    isChecked ? "border-[#FF6B00] border-2" : "border-neutral-300"
                   )}
                 >
                   {isChecked && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B00]" />
                   )}
                 </div>
                 <span>{opt.label}</span>
@@ -768,32 +792,51 @@ export default function RegisterPTPage() {
       {/* Đánh giá */}
       <div className="space-y-3">
         <span className="block text-sm font-bold text-neutral-800">Đánh giá</span>
-        {/* SỬA TẠI ĐÂY: Dùng grid-cols-4 giúp 4 nút luôn nằm ngay ngắn trên ĐÚNG 1 HÀNG */}
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-4 gap-2">
           {[
             { label: "Từ 3 sao", value: 3 },
             { label: "Từ 4 sao", value: 4 },
             { label: "5 sao", value: 5 },
             { label: "Tất cả", value: null }
           ].map((opt) => {
-            const isSelected = tempRating === opt.value;
+            const isChecked = tempRating === opt.value;
             return (
-              <button
+              <label
                 key={opt.label}
-                type="button"
-                onClick={() => setTempRating(opt.value)}
                 className={cn(
-                  "flex items-center justify-center gap-0.5 h-8 rounded-lg text-[11px] font-bold border transition cursor-pointer select-none px-1",
-                  isSelected
+                  /* SỬA TẠI ĐÂY: Thay justify-center bằng justify-start kèm px-2.5 để đẩy toàn bộ nội dung sang trái */
+                  "flex items-center justify-start flex-nowrap whitespace-nowrap gap-1.5 h-9 rounded-lg text-[11px] font-bold border transition cursor-pointer select-none px-2.5",
+                  isChecked
                     ? "bg-[#FFF0E5] border-[#FF6B00] text-[#FF6B00]"
                     : "bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-50"
                 )}
               >
+                <input
+                  type="radio"
+                  name="rating"
+                  value={opt.value ?? "all"}
+                  checked={isChecked}
+                  onChange={() => setTempRating(opt.value)}
+                  className="sr-only"
+                />
+                
+                {/* Vòng tròn Radio */}
+                <div
+                  className={cn(
+                    "w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 transition",
+                    isChecked ? "border-[#FF6B00] border-2" : "border-neutral-300"
+                  )}
+                >
+                  {isChecked && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B00]" />
+                  )}
+                </div>
+
                 {opt.value !== null && (
-                  <Star className={cn("h-3 w-3 shrink-0", isSelected ? "fill-amber-400 text-amber-400" : "fill-neutral-400 text-neutral-400")} />
+                  <Star className={cn("h-3 w-3 shrink-0 ml-0.5", isChecked ? "fill-amber-400 text-amber-400" : "fill-neutral-400 text-neutral-400")} />
                 )}
                 <span>{opt.label}</span>
-              </button>
+              </label>
             );
           })}
         </div>
@@ -872,7 +915,6 @@ export default function RegisterPTPage() {
       </div>
 
       {/* Actions */}
-      {/* SỬA TẠI ĐÂY: Biến đổi thành grid-cols-2 trải đều w-full giúp hai nút ở chính giữa dưới cùng và bằng size nhau chằn chặn */}
       <div className="border-t border-neutral-100 pt-4 grid grid-cols-2 gap-3 w-full">
         <button
           type="button"
@@ -888,12 +930,11 @@ export default function RegisterPTPage() {
         <button
           type="button"
           onClick={() => {
-            // Đồng bộ toàn bộ state tạm thời sang state lọc chính thức
             setSelectedGender(tempGender);
             setSelectedRating(tempRating);
             setSelectedCategories(tempCategories);
-            setCurrentPage(1); // Reset về trang 1 khi lọc
-            setIsFilterDropdownOpen(false); // Đóng bản lọc
+            setCurrentPage(1); 
+            setIsFilterDropdownOpen(false); 
           }}
           className="flex h-10 items-center justify-center rounded-xl bg-[#FF6B00] text-sm font-bold text-white hover:bg-[#E05E00] transition cursor-pointer shadow-xs"
         >
