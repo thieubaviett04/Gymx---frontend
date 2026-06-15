@@ -83,11 +83,11 @@ export default function PackageCard({
     {price}
   </span>
 
-  {showDiscount && (
-    <span className="rounded bg-[#FFF0E5] px-1.5 py-0.5 text-[9px] font-bold text-[#FF6B00] border border-[#FF6B00]/10">
-      -50%
-    </span>
-  )}
+{showDiscount && (
+  <span className="rounded bg-yellow-200 px-1 py-0.5 text-[9px] font-bold text-orange-500 border border-yellow-200">
+  -50%
+</span>
+)}
 
 </div>
 </div></div>

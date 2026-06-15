@@ -5,7 +5,7 @@ export const packages = [
     duration: "1 tháng",
     price: "250.000 VNĐ",
     description:
-      "Tiết kiệm 50% so với gói 1 tháng, dùng đầy đủ thiết bị cao cấp.",
+      "Tiết kiệm 50% so với bình thường, dùng đầy đủ thiết bị cao cấp.",
   },
   {
     id: "GT002",
