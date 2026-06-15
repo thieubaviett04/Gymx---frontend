@@ -111,7 +111,7 @@ export default function PackageDetailPanel({
             "
           />
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between h-8">
             <h2 className="pl-0.5 font-bold text-neutral-800 text-[15px]">
               Chi tiết gói tập
             </h2>
@@ -133,7 +133,7 @@ export default function PackageDetailPanel({
         </div>
 
         {/* Content Area */}
-<div className="flex-1 overflow-y-auto px-6 pt-4 pb-5 space-y-5">
+<div className="flex-1 overflow-y-auto px-6 pt-4 pb-2 space-y-5">
           {/* Main Info */}
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-4">
@@ -172,7 +172,7 @@ export default function PackageDetailPanel({
           </div>
 
           {/* Description */}
-          <div className="space-y-2.5">
+<div className="space-y-2.5 pt-2">
             <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-wider">
               Mô tả chi tiết
             </p>
@@ -201,16 +201,16 @@ export default function PackageDetailPanel({
         </div>
 
         {/* Pricing Actions Block */}
-        <div
-          className="
-            flex-none
-            border-t border-neutral-150
-            bg-white
-            p-6
-            space-y-4
-            shadow-inner-xs
-          "
-        >
+        <div className="flex-none border-t border-neutral-150 bg-white p-4">
+  <div
+    className="
+      rounded-2xl
+      border border-[#FFB980]
+      bg-[#FFF9F4]
+      p-5
+      space-y-3
+    "
+  >
           {/* Savings Tag */}
           <div
             className={`
@@ -271,7 +271,7 @@ export default function PackageDetailPanel({
               text-center
               text-xs
               text-neutral-450
-              pt-1
+              pt-0
             "
           >
             Hoặc gọi hotline tư vấn 24/7
@@ -280,6 +280,7 @@ export default function PackageDetailPanel({
               1900 1234
             </span>
           </div>
+        </div>
         </div>
       </div>
     </>
