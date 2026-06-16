@@ -230,8 +230,8 @@ if (selectedDate <= todayDate) {
       )}
 
       {/* Modal Dialog */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl relative text-neutral-800 max-h-[85vh] overflow-y-auto">
+      <div className="fixed left-1/2 top-[53%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl relative text-neutral-800 ">
           
           {/* Close button */}
           <button

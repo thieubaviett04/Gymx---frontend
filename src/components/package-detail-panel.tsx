@@ -1,5 +1,6 @@
 import { CheckCircle2, Phone, X } from "lucide-react";
 
+
 type SelectedPackage = {
   id: string;
   name: string;
@@ -8,12 +9,14 @@ type SelectedPackage = {
   description: string;
 };
 
+
 type Props = {
   open: boolean;
   onClose: () => void;
   onRegister: () => void;
   selectedPackage?: SelectedPackage | null;
 };
+
 
 export default function PackageDetailPanel({
   open,
@@ -22,6 +25,7 @@ export default function PackageDetailPanel({
   selectedPackage,
 }: Props) {
   if (!selectedPackage) return null;
+
 
   // Dynamic benefits based on package tier/id
   const getBenefits = (id: string) => {
@@ -69,7 +73,9 @@ export default function PackageDetailPanel({
     ];
   };
 
+
   const isFeatured = selectedPackage.id === "GT001";
+
 
   return (
     <>
@@ -83,6 +89,7 @@ export default function PackageDetailPanel({
           ${open ? "opacity-100" : "pointer-events-none opacity-0"}
         `}
       />
+
 
       {/* Panel */}
       <div
@@ -111,10 +118,12 @@ export default function PackageDetailPanel({
             "
           />
 
+
           <div className="flex items-center justify-between h-8">
             <h2 className="pl-0.5 font-bold text-neutral-800 text-[15px]">
               Chi tiết gói tập
             </h2>
+
 
             <button
               onClick={onClose}
@@ -132,6 +141,7 @@ export default function PackageDetailPanel({
           </div>
         </div>
 
+
         {/* Content Area */}
 <div className="flex-1 overflow-y-auto px-6 pt-4 pb-2 space-y-5">
           {/* Main Info */}
@@ -148,6 +158,7 @@ export default function PackageDetailPanel({
               GymMax Strength & Fitness Club
             </p>
           </div>
+
 
           {/* Duration info */}
           <div className="space-y-2.5">
@@ -171,6 +182,7 @@ export default function PackageDetailPanel({
             </div>
           </div>
 
+
           {/* Description */}
 <div className="space-y-2.5 pt-2">
             <p className="text-xs font-extrabold text-neutral-400 uppercase tracking-wider">
@@ -180,6 +192,7 @@ export default function PackageDetailPanel({
               {selectedPackage.description}
             </p>
           </div>
+
 
           {/* Benefits List */}
           <div className="space-y-3 pt-2">
@@ -199,6 +212,7 @@ export default function PackageDetailPanel({
             </ul>
           </div>
         </div>
+
 
         {/* Pricing Actions Block */}
         <div className="flex-none border-t border-neutral-150 bg-white p-4">
@@ -221,13 +235,14 @@ export default function PackageDetailPanel({
               text-[10px]
               font-extrabold
               tracking-wider
-              ${isFeatured 
-                ? "bg-[#FFF0E5] text-[#FF6B00] border border-[#FF6B00]/10" 
+              ${isFeatured
+                ? "bg-[#FFF0E5] text-[#FF6B00] border border-[#FF6B00]/10"
                 : "bg-neutral-100 text-neutral-600 border border-neutral-200/50"}
             `}
           >
             {isFeatured ? "TIẾT KIỆM TỚI 50%" : "ĐĂNG KÝ NGAY HÔM NAY"}
           </div>
+
 
           {/* Price Label */}
           <div className="flex items-end justify-between">
@@ -243,6 +258,7 @@ export default function PackageDetailPanel({
               </div>
             </div>
           </div>
+
 
           {/* Register Button */}
           <button
@@ -264,6 +280,7 @@ export default function PackageDetailPanel({
           >
             Đăng ký gói này ngay
           </button>
+
 
           {/* Hotline Contact */}
           <div
