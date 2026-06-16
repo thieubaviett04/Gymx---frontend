@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, ChevronLeft } from "lucide-react";
 
 interface SidePanelProps {
@@ -12,6 +13,12 @@ interface SidePanelProps {
 }
 
 export default function SidePanel({ isOpen, onClose, title, children, onBack }: SidePanelProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Đóng panel bằng phím ESC
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -19,7 +26,7 @@ export default function SidePanel({ isOpen, onClose, title, children, onBack }: 
     };
 
     if (isOpen) {
-      document.body.style.overflow = "hidden"; // Khóa scroll màn hình sau
+      document.body.style.overflow = "hidden";
       window.addEventListener("keydown", handleKeyDown);
     }
 
@@ -29,10 +36,10 @@ export default function SidePanel({ isOpen, onClose, title, children, onBack }: 
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex justify-end">
       {/* Overlay mờ phía sau */}
       <div
         className="fixed inset-0 bg-neutral-foreground/40 backdrop-blur-xs transition-opacity duration-300"
@@ -83,6 +90,7 @@ export default function SidePanel({ isOpen, onClose, title, children, onBack }: 
           animation: slideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
-    </div>
+    </div>,
+    document.body
   );
 }
