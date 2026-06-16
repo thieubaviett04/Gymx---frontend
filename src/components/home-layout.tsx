@@ -170,11 +170,13 @@ export function HomeLayout({ children, pageTitle, pageSubtitle, pageIcon }: Home
                   <Icon className={cn("h-5 w-5 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
                   <span className="truncate">{item.label}</span>
                 </div>
-                {item.isOpen ? (
-                  <ChevronDown className={cn("h-4 w-4 shrink-0", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
-                ) : (
-                  <ChevronDown className={cn("h-4 w-4 shrink-0 -rotate-90 transition-transform", isParentActive ? "text-[#FF6B00]" : "text-neutral-500")} />
-                )}
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 shrink-0 transition-transform duration-200",
+                    item.isOpen ? "rotate-180" : "rotate-0",
+                    isParentActive ? "text-[#FF6B00]" : "text-neutral-500"
+                  )}
+                />
               </button>
 
               {item.isOpen && (
