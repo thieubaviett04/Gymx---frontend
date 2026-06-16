@@ -96,14 +96,23 @@ export default function ShiftGridTable() {
   };
 
   const handleRegisterClick = () => {
+    // Nếu đã hết hạn/quá khứ thì hiển thị thông báo lỗi thay vì chạy logic đăng ký
+    if (isReadOnly) {
+      showToast("Đã hết thời gian đăng ký ca làm", "error");
+      return;
+    }
+
+    // Nếu không khả dụng do lý do khác (đã đăng ký rồi chẳng hạn)
+    if (isGridDisabled) {
+      return;
+    }
+
     registerSelectedShifts();
   };
 
   const handleCancelClick = () => {
     if (isReadOnly) {
-      if (isExpired) {
-        showToast("Đã hết thời gian không thể hủy", "error");
-      }
+      showToast("Đã hết thời gian hủy lịch làm", "error");
       return;
     }
 
@@ -124,7 +133,7 @@ export default function ShiftGridTable() {
       {/* Panel Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-[#FF6B00] pl-3">
         <div>
-          <h3 className="font-bold text-neutral-800 text-sm tracking-wide uppercase">
+          <h3 className="text-lg font-bold text-neutral-800">
             Chọn ca làm việc
           </h3>
           <p className="text-xs text-neutral-400 mt-0.5">
@@ -186,21 +195,22 @@ export default function ShiftGridTable() {
             onClick={handleCancelClick}
             className={`
               flex-1 sm:flex-initial
-              border border-neutral-300
-              text-neutral-600
-              bg-white
+              border
               font-bold
               text-sm
               px-6 py-2.5
               rounded-xl
               transition-all
               cursor-pointer
-              ${isReadOnly ? "opacity-50 cursor-not-allowed" : "hover:border-neutral-450 hover:bg-neutral-50 active:bg-neutral-100"}
+              ${isReadOnly
+                ? "bg-neutral-100 text-neutral-400 border-neutral-200 opacity-70"
+                : "border-neutral-300 text-neutral-600 bg-white hover:border-neutral-450 hover:bg-neutral-50 active:bg-neutral-100"
+              }
             `}
-            disabled={isReadOnly && isExpired}
           >
             Hủy
           </button>
+
           <button
             onClick={handleRegisterClick}
             className={`
@@ -213,12 +223,13 @@ export default function ShiftGridTable() {
               transition-all
               shadow-md
               cursor-pointer
-              ${isGridDisabled
-                ? "bg-neutral-300 cursor-not-allowed opacity-50 shadow-none"
-                : "bg-[#FF6B00] hover:bg-[#E56000] active:scale-98"
+              ${isReadOnly
+                ? "bg-[#FF6B00]/40 cursor-pointer shadow-none text-white/80"
+                : isGridDisabled
+                  ? "bg-neutral-300 cursor-not-allowed opacity-50 shadow-none text-neutral-500"
+                  : "bg-[#FF6B00] hover:bg-[#E56000] active:scale-98"
               }
             `}
-            disabled={isGridDisabled}
           >
             Đăng ký
           </button>

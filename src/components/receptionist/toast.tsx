@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import { useSchedule } from "@/context/ScheduleContext";
-import { X, Check, AlertCircle, AlertTriangle } from "lucide-react";
+// CHỖ SỬA 1: Thêm XCircle vào đoạn import từ lucide-react
+import { X, Check, XCircle, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Toast() {
@@ -36,11 +37,14 @@ export default function Toast() {
                   <Check className="w-3.5 h-3.5 text-white stroke-[3px]" />
                 </div>
               )}
+
+              {/* CHỖ SỬA 2: Thay đổi AlertCircle thành XCircle để hiển thị dấu X trắng trên nền đỏ */}
               {toast.type === "error" && (
                 <div className="w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-3.5 h-3.5 text-white stroke-[3px]" />
+                  <XCircle className="w-3.5 h-3.5 text-white stroke-[3px]" />
                 </div>
               )}
+
               {toast.type === "warning" && (
                 <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-3.5 h-3.5 text-white stroke-[3px]" />

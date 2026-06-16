@@ -47,7 +47,7 @@ export default function WeekSelector() {
     <div className="bg-white rounded-2xl shadow-xl border border-neutral-100 p-6 space-y-4">
       {/* Selector Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-l-4 border-[#FF6B00] pl-3">
-        <h3 className="font-bold text-neutral-800 text-sm tracking-wide uppercase">
+        <h3 className="text-lg font-bold text-neutral-800">
           Chọn tuần làm việc
         </h3>
 

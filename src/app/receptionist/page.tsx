@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Bookmark, Users, CalendarDays, FileText } from "lucide-react";
+import { Bookmark, Users, CalendarDays, FilePenLine } from "lucide-react";
 
 export default function ReceptionistHome() {
   const router = useRouter();
@@ -13,6 +13,7 @@ export default function ReceptionistHome() {
 
   return (
     <div className="animate-in fade-in select-none duration-300">
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {/* Đăng ký gói tập */}
         <div
@@ -74,7 +75,7 @@ export default function ReceptionistHome() {
           className="group flex h-48 cursor-pointer flex-col justify-between rounded-2xl border border-neutral-100 bg-white p-6 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-500 transition-transform duration-300 group-hover:scale-105">
-            <FileText className="h-6 w-6" />
+            <FilePenLine className="h-6 w-6" />
           </div>
           <div className="mt-4 space-y-1">
             <h3 className="text-lg font-bold text-neutral-800">
