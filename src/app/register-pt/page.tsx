@@ -1015,7 +1015,7 @@ React.useEffect(() => {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
                 {paginatedTrainers.map((trainer) => (
                   <div
                     key={trainer.id}
@@ -1037,7 +1037,7 @@ React.useEffect(() => {
                               {trainer.name}
                             </h3>
                             <p className="text-xs text-neutral-500 mt-0.5">
-                              {trainer.gender} - {trainer.experience} năm kinh nghiệm
+                              {trainer.gender} · {trainer.experience} năm kinh nghiệm
                             </p>
                           </div>
                         </div>
@@ -1048,41 +1048,35 @@ React.useEffect(() => {
                         </span>
                       </div>
 
-                      {/* Rating section */}
-                      <div className="mt-4 flex items-center gap-1.5">
-                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-bold text-neutral-800">{trainer.rating}</span>
-                        <span className="h-1 w-1 rounded-full bg-neutral-300 mx-1" />
-                        <span className="text-xs text-neutral-505">{trainer.reviewsCount} ca trống hôm nay</span>
+                      {/* Rating + Price row */}
+                      <div className="mt-4 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-bold text-neutral-800">{trainer.rating}</span>
+                        </div>
+                        <div>
+                          <span className="text-lg font-extrabold text-neutral-900">
+                            {formatMoney(trainer.price)}
+                          </span>
+                          <span className="text-xs text-neutral-500">/giờ</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Pricing & CTA */}
-                    <div className="mt-6 flex items-center justify-between pt-4 border-t border-neutral-100">
-                      <div>
-                        <span className="text-lg font-extrabold text-neutral-900">
-                          {formatMoney(trainer.price)}
-                        </span>
-                        <span className="text-xs text-neutral-505">/giờ</span>
-                      </div>
-
-                      <div className="flex gap-2 justify-end ml-auto">
-                        <button
-                          onClick={() => handleOpenDetailDrawer(trainer)}
-                          // Đặt cứng độ rộng w-[90px], giảm padding py-1.5, text-xs cho nhỏ gọn
-                          className="w-[90px] h-8 rounded-lg border border-neutral-200 bg-neutral-50 text-[11px] font-bold text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900 text-center cursor-pointer"
-                        >
-                          Xem chi tiết
-                        </button>
-                        <button
-                          onClick={() => handleTrainerSelect(trainer)}
-                          // Đồng bộ kích thước w-[90px] và h-8 như nút bên cạnh
-                          className="w-[90px] h-8 rounded-lg bg-[#FF6B00] text-[11px] font-bold text-white transition hover:bg-[#CC5500] text-center cursor-pointer"
-                        >
-                          Chọn
-                        </button>
-                      </div>
-                      
+                    {/* CTA Buttons */}
+                    <div className="mt-5 flex gap-3 pt-4 border-t border-neutral-100">
+                      <button
+                        onClick={() => handleOpenDetailDrawer(trainer)}
+                        className="flex-1 h-10 rounded-xl border border-neutral-200 bg-white text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-900 text-center cursor-pointer"
+                      >
+                        Xem chi tiết
+                      </button>
+                      <button
+                        onClick={() => handleTrainerSelect(trainer)}
+                        className="flex-1 h-10 rounded-xl bg-[#FF6B00] text-sm font-bold text-white transition hover:bg-[#E05E00] text-center cursor-pointer shadow-sm shadow-[#FF6B00]/30"
+                      >
+                        Chọn
+                      </button>
                     </div>
 
                   </div>
