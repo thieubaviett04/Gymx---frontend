@@ -1,6 +1,7 @@
 import { Clock3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+
 type Props = {
   id: string;
   name: string;
@@ -12,6 +13,7 @@ type Props = {
   onRegister?: () => void;
   onDetail?: () => void;
 };
+
 
 export default function PackageCard({
   id,
@@ -29,16 +31,17 @@ export default function PackageCard({
       className={cn(
         "group flex flex-col justify-between rounded-2xl border bg-white p-5 shadow-xs transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden font-sans h-full min-h-[220px]",
         featured
-          ? "border-[#FF6B00] border-2 shadow-[#FF6B00]/5"
-          : "border-neutral-200"
+  ? "border-[#FF6B00] border-[3px] ring-1 ring-orange-200 shadow-lg shadow-orange-100"
+  : "border-neutral-200"
       )}
     >
       {/* Featured Ribbon / Badge */}
       {featured && (
 <div className="absolute right-0 top-0 bg-gradient-to-l from-[#FF6B00] to-[#FF8833] text-white text-[7.5px] font-bold uppercase px-2 py-0.75 rounded-bl-md shadow-xs select-none">
-  🔥 PHỔ BIẾN NHẤT
+🔥 PHỔ BIẾN NHẤT
 </div>
       )}
+
 
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -47,18 +50,22 @@ export default function PackageCard({
             {name}
           </h3>
 
+
           <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[10px] text-neutral-600 border border-neutral-200/50 font-mono font-bold shrink-0">
             {id}
           </span>
         </div>
+
 
         {/* Description */}
         <p className="mb-4 text-xs leading-relaxed text-neutral-500 ">
           {description}
         </p>
 
+
         {/* Duration & Price Row matching design */}
         <div className="space-y-2 font-sans">
+
 
   <div className="flex items-center gap-1.5 text-xs text-neutral-500">
     <Clock3 size={14} />
@@ -71,7 +78,9 @@ export default function PackageCard({
     </span>
   </div>
 
+
 <div className="flex items-center justify-end gap-2">
+
 
   {showDiscount && (
     <span className="text-[10px] text-neutral-400 line-through">
@@ -79,15 +88,18 @@ export default function PackageCard({
     </span>
   )}
 
+
   <span className="text-2xl font-extrabold text-[#FF6B00]">
     {price}
   </span>
+
 
 {showDiscount && (
   <span className="rounded bg-yellow-200 px-1 py-0.5 text-[9px] font-bold text-orange-500 border border-yellow-200">
   -50%
 </span>
 )}
+
 
 </div>
 </div></div>
@@ -100,6 +112,7 @@ export default function PackageCard({
         >
           Xem chi tiết
         </button>
+
 
         <button
           type="button"
