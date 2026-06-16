@@ -178,7 +178,7 @@ export default function MockTimeController() {
             {/* Live Custom Picker */}
             <div className="space-y-3 bg-neutral-950/40 p-4 rounded-xl border border-neutral-800">
               <span className="text-xs font-bold text-neutral-450 block">Tự chỉnh thời gian (Thay đổi sẽ tự validate):</span>
-              
+
               {/* Text input for manual typing */}
               <div className="space-y-1">
                 <label className="text-[10px] text-neutral-450 font-bold block">Nhập tay thời gian (DD/MM/YYYY HH:mm)</label>
@@ -188,13 +188,11 @@ export default function MockTimeController() {
                     value={typedTime}
                     onChange={(e) => handleTypedTimeChange(e.target.value)}
                     placeholder="VD: 13/06/2026 08:30"
-                    className={`w-full bg-neutral-800 border rounded-lg pl-3 pr-20 py-1.5 text-xs text-white focus:outline-none font-mono ${
-                      isValid ? "border-neutral-700 focus:border-[#FF6B00]" : "border-rose-500 focus:border-rose-500"
-                    }`}
+                    className={`w-full bg-neutral-800 border rounded-lg pl-3 pr-20 py-1.5 text-xs text-white focus:outline-none font-mono ${isValid ? "border-neutral-700 focus:border-[#FF6B00]" : "border-rose-500 focus:border-rose-500"
+                      }`}
                   />
-                  <span className={`absolute right-2 top-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                    isValid ? "text-emerald-400 bg-emerald-950/50" : "text-rose-400 bg-rose-950/50"
-                  }`}>
+                  <span className={`absolute right-2 top-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded ${isValid ? "text-emerald-400 bg-emerald-950/50" : "text-rose-400 bg-rose-950/50"
+                    }`}>
                     {isValid ? "Hợp lệ" : "Lỗi định dạng"}
                   </span>
                 </div>
@@ -222,46 +220,6 @@ export default function MockTimeController() {
               </div>
             </div>
 
-            {/* Quick Presets */}
-            <div className="space-y-2 pt-1 border-t border-neutral-800">
-              <span className="text-[10px] font-bold text-neutral-450 block">Hoặc chọn nhanh kịch bản:</span>
-
-              <button
-                type="button"
-                onClick={() => setPreset("before")}
-                className="w-full text-left bg-neutral-800 hover:bg-neutral-750 p-2.5 rounded-lg border border-neutral-700 transition-colors flex items-start gap-2 text-xs cursor-pointer"
-              >
-                <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1 shrink-0" />
-                <div>
-                  <span className="font-bold block text-neutral-200">1. Trong thời hạn đăng ký</span>
-                  <span className="text-neutral-450 text-[11px]">Thứ 5, 11/06/2026. Có thể chọn, đăng ký và hủy.</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPreset("after")}
-                className="w-full text-left bg-neutral-800 hover:bg-neutral-750 p-2.5 rounded-lg border border-neutral-700 transition-colors flex items-start gap-2 text-xs cursor-pointer"
-              >
-                <div className="w-2 h-2 rounded-full bg-amber-500 mt-1 shrink-0" />
-                <div>
-                  <span className="font-bold block text-neutral-200">2. Quá hạn đăng ký / hủy (E-3 & E-4)</span>
-                  <span className="text-neutral-450 text-[11px]">Chủ nhật, 14/06/2026. Tuần 3 bị khóa không thể đăng ký hay hủy.</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPreset("past")}
-                className="w-full text-left bg-neutral-800 hover:bg-neutral-750 p-2.5 rounded-lg border border-neutral-700 transition-colors flex items-start gap-2 text-xs cursor-pointer"
-              >
-                <div className="w-2 h-2 rounded-full bg-rose-500 mt-1 shrink-0" />
-                <div>
-                  <span className="font-bold block text-neutral-200">3. Xem lịch trong quá khứ (E-1)</span>
-                  <span className="text-neutral-450 text-[11px]">Đặt hệ thống sang 05/07/2026. Tuần tháng 6 thành quá khứ.</span>
-                </div>
-              </button>
-            </div>
 
             <div className="flex items-center gap-1.5 bg-neutral-950 p-2 rounded text-[10px] text-neutral-400 border border-neutral-950">
               <AlertCircle className="w-3.5 h-3.5 text-[#FF6B00] shrink-0" />

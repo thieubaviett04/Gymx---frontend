@@ -7,14 +7,29 @@ import {
   Bell,
   ChevronDown,
   LayoutGrid,
-  Menu,
   Bookmark,
   Users,
   CalendarDays,
-  FileText,
+  FilePenLine,
   LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Biểu tượng menu không đều theo hình mẫu của bạn
+const UnalignedMenuIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+  >
+    <line x1="4" x2="12" y1="6" y2="6" />
+    <line x1="4" x2="20" y1="12" y2="12" />
+    <line x1="4" x2="20" y1="18" y2="18" />
+  </svg>
+);
 
 interface ReceptionistLayoutProps {
   children: React.ReactNode;
@@ -35,6 +50,9 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
   const [authorized, setAuthorized] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  // Quản lý trạng thái đóng/mở Sidebar trên máy tính công sở (PC)
+  const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true);
 
   useEffect(() => {
     const role = localStorage.getItem("userRole");
@@ -84,7 +102,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
     {
       id: "register-schedule",
       label: "Đăng ký lịch làm việc",
-      icon: FileText,
+      icon: FilePenLine,
       onClick: () => router.push("/receptionist/schedule"),
     },
   ];
@@ -97,8 +115,8 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
           item.id === "home"
             ? pathname === "/receptionist"
             : item.id === "register-schedule"
-            ? pathname === "/receptionist/schedule"
-            : false;
+              ? pathname === "/receptionist/schedule"
+              : false;
 
         return (
           <button
@@ -112,10 +130,18 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
               isActive
                 ? "bg-[#FFF0E5] text-[#FF6B00]"
                 : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900",
+              !isDesktopSidebarOpen && !closeMobile && "justify-center px-2" // Căn giữa icon khi menu đóng
             )}
           >
             <Icon className={cn("h-5 w-5 shrink-0", isActive ? "text-[#FF6B00]" : "text-neutral-600")} />
-            <span className="truncate">{item.label}</span>
+
+            {/* Tự động ẩn chữ menu khi đóng sidebar trên màn hình PC */}
+            <span className={cn(
+              "truncate transition-all duration-200",
+              !isDesktopSidebarOpen && !closeMobile && "hidden"
+            )}>
+              {item.label}
+            </span>
           </button>
         );
       })}
@@ -133,13 +159,29 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
     );
   }
 
+  // Logic đóng mở thông minh
+  const handleToggleMenu = () => {
+    if (window.innerWidth < 768) {
+      setIsMobileSidebarOpen(true);
+    } else {
+      setIsDesktopSidebarOpen(!isDesktopSidebarOpen);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-neutral-900 font-sans text-neutral-900">
-      {/* Desktop Sidebar */}
-      <aside className="hidden h-full w-[295px] shrink-0 select-none flex-col border-r border-neutral-200 bg-white md:flex">
-        <div className="flex items-center justify-center gap-2 border-b border-neutral-100 p-6 text-center">
-          <span className="text-2xl font-bold tracking-tight text-neutral-900">
-            Gym <span className="text-[#FF6B00]">Max</span>
+      {/* Desktop Sidebar - Thay đổi kích thước w-[295px] thành w-[76px] mượt mà */}
+      <aside className={cn(
+        "hidden h-full shrink-0 select-none flex-col border-r border-neutral-200 bg-white md:flex transition-all duration-300",
+        isDesktopSidebarOpen ? "w-[295px]" : "w-[76px]"
+      )}>
+        <div className="flex items-center justify-center border-b border-neutral-100 p-6 text-center h-[77px]">
+          <span className="text-2xl font-bold tracking-tight text-neutral-900 truncate">
+            {isDesktopSidebarOpen ? (
+              <>Gym <span className="text-[#FF6B00]">Max</span></>
+            ) : (
+              <span className="text-[#FF6B00] text-xl">G.M</span>
+            )}
           </span>
         </div>
         {renderNav()}
@@ -154,12 +196,10 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
       )}
 
       {/* Mobile Sidebar drawer */}
-      <aside
-        className={cn(
-          "fixed bottom-0 left-0 top-0 z-50 flex w-[295px] flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:hidden",
-          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
-        )}
-      >
+      <aside className={cn(
+        "fixed bottom-0 left-0 top-0 z-50 flex w-[295px] flex-col border-r border-neutral-200 bg-white transition-transform duration-300 md:hidden",
+        isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
+      )}>
         <div className="w-full border-b border-neutral-100 p-6 text-center">
           <span className="text-2xl font-bold tracking-tight text-neutral-900">
             Gym <span className="text-[#FF6B00]">Max</span>
@@ -182,33 +222,30 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
         <header className="relative z-20 shrink-0 select-none border-b border-white/5 px-6 py-4">
           <div className="flex w-full items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
+
+              {/* Nút bấm gạch không đều xử lý đóng menu bên cạnh */}
               <button
-                onClick={() => setIsMobileSidebarOpen(true)}
-                className="cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10 md:hidden"
+                onClick={handleToggleMenu}
+                className={cn(
+                  "cursor-pointer rounded-lg p-1.5 text-white hover:bg-white/10 flex items-center justify-center shrink-0",
+                  // Nếu là trang chủ thì ẩn luôn cả trên PC lẫn Mobile (hidden), trang khác thì hiện bình thường (flex)
+                  pathname === "/receptionist" ? "hidden" : "flex"
+                )}
                 aria-label="Mở menu"
               >
-                <svg
-                  className="h-6 w-6"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <line x1="4" x2="12" y1="6" y2="6" />
-                  <line x1="4" x2="20" y1="12" y2="12" />
-                  <line x1="4" x2="20" y1="18" y2="18" />
-                </svg>
+                <UnalignedMenuIcon className="h-6 w-6 stroke-[2.5]" />
               </button>
+
               <div className="min-w-0 space-y-0.5 text-white">
                 <h4 className="truncate text-xl font-bold leading-7">
-                  {pageTitle || "Xin chào Lễ tân!"}
+                  {/* Nếu đang ở Trang chủ (pathname === "/receptionist") thì hiện Xin chào, ngược lại giữ nguyên tiêu đề trang */}
+                  {pathname === "/receptionist" ? "Xin chào Lễ Tân" : (pageTitle || "Đăng ký lịch làm")}
                 </h4>
-                {((!pageTitle && !pageSubtitle) || pageSubtitle) && (
-                  <div className="truncate text-sm font-medium text-neutral-300">
-                    {pageSubtitle || "Chọn một thao tác bên dưới để bắt đầu."}
-                  </div>
-                )}
+
+                {/* Hiển thị phụ đề (Subtitle) động tương ứng */}
+                <div className="truncate text-sm font-medium text-neutral-300">
+                  Chọn một thao tác bên dưới để bắt đầu.
+                </div>
               </div>
             </div>
 
@@ -222,7 +259,6 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-neutral-950" />
               </button>
 
-              {/* Avatar profile area with Dropdown logout */}
               <div className="relative flex items-center gap-3 border-l border-white/10 pl-2">
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -240,10 +276,7 @@ export function ReceptionistLayout({ children, pageTitle, pageSubtitle }: Recept
 
                 {isProfileMenuOpen && (
                   <>
-                    <div
-                      onClick={() => setIsProfileMenuOpen(false)}
-                      className="fixed inset-0 z-40"
-                    />
+                    <div onClick={() => setIsProfileMenuOpen(false)} className="fixed inset-0 z-40" />
                     <div className="absolute right-0 top-11 z-50 mt-1 w-48 rounded-xl border border-neutral-250 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-3 py-2 border-b border-neutral-100">
                         <p className="text-[10px] font-semibold text-neutral-400 uppercase">Vai trò</p>
