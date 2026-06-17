@@ -413,7 +413,7 @@ if (selectedDate <= todayDate) {
                 {/* Add-on Benefits */}
                 <div className="space-y-2 pt-0">
                   <label className="text-xs font-bold text-neutral-750">
-                    Quyền lợi
+                    Dịch vụ bổ sung
                   </label>
                   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                     {[
