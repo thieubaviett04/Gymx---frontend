@@ -223,13 +223,13 @@ export default function HistoryTable({
                         </span>
                       ) : b.rating ? (
                         <div className="space-y-0.5">
-                          <div className="flex text-accent gap-0.5">
+                          <div className="flex text-amber-400 gap-0.5">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 className={`w-3.5 h-3.5 ${
                                   i < (b.rating || 0)
-                                    ? "fill-accent stroke-accent"
+                                    ? "fill-amber-400 text-amber-400"
                                     : "stroke-neutral-border text-neutral-border"
                                 }`}
                               />
@@ -250,7 +250,7 @@ export default function HistoryTable({
                             e.stopPropagation();
                             onOpenRating(b);
                           }}
-                          className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#FFF0E5] text-[#FF6B00] hover:bg-[#FF6B00] hover:text-white transition-colors"
+                          className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#FF6B00] text-white hover:bg-[#CC5500] transition-colors"
                         >
                           Đánh giá
                         </button>

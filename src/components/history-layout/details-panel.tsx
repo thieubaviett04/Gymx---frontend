@@ -184,7 +184,7 @@ export default function DetailsPanel({
                       <Star
                         key={i}
                         className={`w-6 h-6 ${i < (selectedBooking.rating || 0)
-                            ? "fill-accent stroke-accent"
+                            ? "fill-amber-400 text-amber-400"
                             : "stroke-neutral-border text-neutral-border"
                           }`}
                       />
@@ -271,7 +271,7 @@ export default function DetailsPanel({
               {/* Star rating selector */}
               <div className="space-y-2">
                 <label className="text-sm font-bold text-neutral-foreground">
-                  Đánh giá tổng quát *
+                  Đánh giá tổng quát <span className="text-[#FF6B00]">*</span>
                 </label>
                 <div className="flex items-center gap-1.5">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -285,7 +285,7 @@ export default function DetailsPanel({
                     >
                       <Star
                         className={`w-6 h-6 transition-all ${star <= (hoverRatingVal || ratingVal)
-                            ? "fill-accent stroke-accent scale-110"
+                            ? "fill-amber-400 text-amber-400 scale-110"
                             : "stroke-neutral-border text-neutral-border"
                           }`}
                       />
@@ -308,7 +308,7 @@ export default function DetailsPanel({
               {/* Comment text area */}
               <div className="space-y-2">
                 <label className="text-sm font-bold text-neutral-foreground">
-                  Nội dung đánh giá *
+                  Nội dung đánh giá <span className="text-[#FF6B00]">*</span>
                 </label>
                 <div className="relative">
                   <textarea

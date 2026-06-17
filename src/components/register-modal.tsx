@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import CustomToast from "@/components/ui/custom-toast";
 
 type SelectedPackage = {
   id: string;
@@ -211,61 +212,12 @@ if (selectedDate <= todayDate) {
         className="fixed inset-0 z-45 bg-black/70 backdrop-blur-xs transition-opacity duration-300"
       />
 
-      {/* Warning Toast */}
-      {showWarning && (
-        <div
-  className="
-    fixed
-    left-1/2
-    top-5
-    z-[60]
-    flex
-    w-[360px]
-    -translate-x-1/2
-    items-center
-    gap-3
-    rounded-full
-    bg-white
-    px-4
-    py-2.5
-    shadow-xl
-    border
-    border-amber-100
-    font-sans
-    animate-in
-    fade-in
-    slide-in-from-top-4
-    duration-300
-  "
->
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">
-            !
-          </div>
-           <span className="flex-1 text-sm font-semibold text-neutral-800">
-            Vui lòng chọn ngày bắt đầu tập!
-          </span>
-             <button
-  onClick={onClose}
-  className="
-    flex
-    h-8
-    w-8
-    items-center
-    justify-center
-    text-gray-500
-    hover:text-gray-700
-    transition-colors
-    cursor-pointer
-    shrink-0
-  "
->
-  <X
-    size={18}
-    strokeWidth={2}
-  />
-</button>
-        </div>
-      )}
+      <CustomToast
+        show={showWarning}
+        type="warning"
+        message="Vui lòng chọn ngày bắt đầu tập!"
+        onClose={() => setShowWarning(false)}
+      />
 
       {/* Modal Dialog */}
       <div className="fixed left-1/2 top-[54%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">

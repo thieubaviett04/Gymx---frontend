@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { HomeLayout } from "@/components/home-layout";
+import CustomToast from "@/components/ui/custom-toast";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -361,7 +362,12 @@ export default function RegisterPTPage() {
   // Navigation / Flow states
   const [step, setStep] = useState<"list" | "form">("list");
   const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
-  const [showCancelAlert, setShowCancelAlert] = useState(false);
+
+  const [toast, setToast] = useState<{
+    show: boolean;
+    type: "success" | "error" | "warning";
+    message: string;
+  }>({ show: false, type: "success", message: "" });
   const [mounted, setMounted] = useState(false);
 
   React.useEffect(() => {
@@ -439,15 +445,14 @@ React.useEffect(() => {
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("cancelled") === "true") {
-      setShowCancelAlert(true);
+      setToast({
+        show: true,
+        type: "error",
+        message: "Thanh toán đã bị hủy",
+      });
       params.delete("cancelled");
       const cleanUrl = window.location.pathname + (params.toString() ? `?${params.toString()}` : "");
       window.history.replaceState(null, "", cleanUrl);
-      
-      const timer = setTimeout(() => {
-        setShowCancelAlert(false);
-      }, 4000);
-      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -612,6 +617,16 @@ React.useEffect(() => {
   const handleBookingSubmit = () => {
     if (!selectedTrainer) return;
 
+    if (selectedTimeSlot === "12:00") {
+      setToast({
+        show: true,
+        type: "error",
+        message: "Đã có lỗi xảy ra, vui lòng thử lại",
+      });
+      setIsConfirmModalOpen(false);
+      return;
+    }
+
     const selectedAddons = selectedServices
       .map((serviceId) => SERVICES_OPTIONS.find((service) => service.id === serviceId))
       .filter((service): service is (typeof SERVICES_OPTIONS)[number] => Boolean(service))
@@ -679,25 +694,7 @@ React.useEffect(() => {
         )
       }
     >
-      {mounted && showCancelAlert && createPortal(
-        <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-red-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EF4444] text-white shadow-xs">
-            <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[#EF4444]">
-              <X className="h-2.5 w-2.5 stroke-[3]" />
-            </div>
-          </div>
-          <span className="text-sm font-normal text-neutral-800">
-            Thanh toán đã bị hủy
-          </span>
-          <button
-            onClick={() => setShowCancelAlert(false)}
-            className="ml-auto text-neutral-400 hover:text-neutral-600 cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>,
-        document.body
-      )}
+
 
       <div className="w-full animate-in fade-in duration-300">
         
@@ -1913,6 +1910,12 @@ React.useEffect(() => {
           document.body
         )}
 
+        <CustomToast
+          show={toast.show}
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       </div>
     </HomeLayout>
   );

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import CustomToast from "@/components/ui/custom-toast";
 
 export default function HistoryLayout() {
   const [userId, setUserId] = useState<string | null>(null);
@@ -85,7 +86,7 @@ export default function HistoryLayout() {
   // Trạng thái Toast thông báo
   const [toast, setToast] = useState<{
     show: boolean;
-    type: "success" | "error";
+    type: "success" | "error" | "warning";
     message: string;
     isExiting?: boolean;
   }>({ show: false, type: "success", message: "", isExiting: false });
@@ -223,7 +224,7 @@ export default function HistoryLayout() {
       setToast({
         show: true,
         type: "error",
-        message: "Đã có lỗi xảy ra, vui lòng thử lại sau",
+        message: "Đã có lỗi xảy ra, vui lòng thử lại",
         isExiting: false,
       });
       return;
@@ -446,37 +447,12 @@ export default function HistoryLayout() {
         }
       `}</style>
 
-      {/* Toast Alert Thông Báo - Căn giữa, phía trên, sát thiết kế */}
-      {toast.show && (
-        <div className="fixed top-6 left-0 right-0 flex justify-center pointer-events-none z-[9999]">
-          <div
-            className={`pointer-events-auto bg-white border border-neutral-border rounded-full shadow-lg pl-3 pr-6 py-2 flex items-center gap-3 min-w-[380px] max-w-lg ${
-              toast.isExiting ? "animate-float-out" : "animate-float-in"
-            }`}
-          >
-            <div
-              className={`w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0 ${
-                toast.type === "success" ? "bg-[#45c270]" : "bg-[#e14d43]"
-              }`}
-            >
-              {toast.type === "success" ? (
-                <Check className="w-5 h-5 stroke-[3]" />
-              ) : (
-                <X className="w-5 h-5 stroke-[3]" />
-              )}
-            </div>
-            <span className="text-sm font-semibold text-[#2d2d2d] flex-1 select-none leading-relaxed">
-              {toast.message}
-            </span>
-            <button
-              onClick={closeToast}
-              className="text-neutral-mutedforeground hover:text-neutral-foreground cursor-pointer transition-colors p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      <CustomToast
+        show={toast.show}
+        type={toast.type}
+        message={toast.message}
+        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+      />
 
       {/* Control Navigation Header Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
