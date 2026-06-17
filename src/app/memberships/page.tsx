@@ -103,7 +103,10 @@ export default function MembershipPage() {
       pageTitle="Đăng ký gói tập"
       pageSubtitle="Chọn gói tập phù hợp để bắt đầu hành trình tập luyện."
     >
-      <ErrorToast show={showError} />
+      <ErrorToast
+  show={showError}
+  onClose={() => setShowError(false)}
+/>
 
       {showCancelAlert && (
         <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-red-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">

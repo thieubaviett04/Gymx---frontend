@@ -213,24 +213,62 @@ if (selectedDate <= todayDate) {
 
       {/* Warning Toast */}
       {showWarning && (
-        <div className="fixed left-1/2 top-5 z-55 flex w-[320px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2 shadow-xl border border-amber-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300">
+        <div
+  className="
+    fixed
+    left-1/2
+    top-5
+    z-[60]
+    flex
+    w-[360px]
+    -translate-x-1/2
+    items-center
+    gap-3
+    rounded-full
+    bg-white
+    px-4
+    py-2.5
+    shadow-xl
+    border
+    border-amber-100
+    font-sans
+    animate-in
+    fade-in
+    slide-in-from-top-4
+    duration-300
+  "
+>
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">
             !
           </div>
-          <span className="text-xs font-bold text-neutral-855">
+           <span className="flex-1 text-sm font-semibold text-neutral-800">
             Vui lòng chọn ngày bắt đầu tập!
           </span>
-          <button
-            onClick={() => setShowWarning(false)}
-            className="ml-auto text-neutral-400 hover:text-neutral-600 font-bold text-lg"
-          >
-            ×
-          </button>
+             <button
+  onClick={onClose}
+  className="
+    flex
+    h-8
+    w-8
+    items-center
+    justify-center
+    text-gray-500
+    hover:text-gray-700
+    transition-colors
+    cursor-pointer
+    shrink-0
+  "
+>
+  <X
+    size={18}
+    strokeWidth={2}
+  />
+</button>
         </div>
       )}
 
       {/* Modal Dialog */}
-      <div className="fixed left-1/2 top-[53%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
+      <div className="fixed left-1/2 top-[54%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-4 font-sans select-none animate-in zoom-in-95 duration-250">
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl relative text-neutral-800 ">
           
           {/* Close button */}

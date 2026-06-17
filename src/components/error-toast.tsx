@@ -4,9 +4,10 @@ import { X } from "lucide-react";
 
 type Props = {
   show: boolean;
+  onClose: () => void;
 };
 
-export default function ErrorToast({ show }: Props) {
+export default function ErrorToast({ show, onClose }: Props) {
   if (!show) return null;
 
   return (
@@ -54,13 +55,30 @@ export default function ErrorToast({ show }: Props) {
           </div>
         </div>
 
-        <span className="text-sm font-normal text-neutral-800">
+        <span className="flex-1 text-sm font-semibold text-neutral-800">
           Có lỗi xảy ra! Vui lòng thử lại
         </span>
 
-        <button className="flex items-center justify-center ml-auto text-neutral-400 hover:text-neutral-600 cursor-pointer">
-          <X className="h-4 w-4" />
-        </button>
+        <button
+  onClick={onClose}
+  className="
+    flex
+    h-8
+    w-8
+    items-center
+    justify-center
+    text-gray-500
+    hover:text-gray-700
+    transition-colors
+    cursor-pointer
+    shrink-0
+  "
+>
+  <X
+    size={18}
+    strokeWidth={2}
+  />
+</button>
       </div>
     </>
   );
