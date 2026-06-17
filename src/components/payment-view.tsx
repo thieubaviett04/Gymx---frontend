@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CheckCircle2, Copy, Check, Clock, ShieldCheck, CreditCard, QrCode, Lock, X, XCircle, ChevronDown, CheckCircle, HelpCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import CustomToast from "@/components/ui/custom-toast";
 import {
   Select,
   SelectContent,
@@ -146,6 +147,7 @@ export function PaymentView({
 
   // 1. Transaction Timeout Timer
   useEffect(() => {
+    if (showSuccessModal) return;
     if (timeLeft <= 0) {
       setShowTimeoutAlert(true);
       return;
@@ -161,7 +163,7 @@ export function PaymentView({
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, showSuccessModal]);
 
   // QR code scan simulation
   const handleQRClick = () => {
@@ -253,39 +255,29 @@ export function PaymentView({
       {paymentMethod === "transfer" && (
         <>
           {/* 1. Loading toast when timer is running */}
-          {timeLeft > 0 && !showTimeoutAlert && (
-            <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-neutral-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300 select-none">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFF0E5] text-[#FF6B00] shadow-xs animate-in fade-in duration-200">
-                <RefreshCw className="h-4 w-4 animate-spin stroke-[2.5]" />
+          {!showSuccessModal && timeLeft > 0 && !showTimeoutAlert && (
+            <div className="fixed top-6 left-0 right-0 flex justify-center pointer-events-none z-[999999] px-4 font-sans select-none">
+              <div className="pointer-events-auto bg-white border border-[#E5E7EB] rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.06)] pl-3.5 pr-4 py-2.5 flex items-center gap-3 w-[360px] max-w-[90vw]">
+                <div className="w-8 h-8 rounded-full bg-[#FFF0E5] text-[#FF6B00] flex items-center justify-center shrink-0 shadow-sm">
+                  <RefreshCw className="w-4 h-4 animate-spin stroke-[2.5]" />
+                </div>
+                <span className="text-sm font-semibold text-[#111111] flex-1 leading-normal text-left pr-1">
+                  Đang xử lý thanh toán...
+                </span>
               </div>
-              <span className="text-sm font-normal text-neutral-800">
-                Đang xử lý thanh toán...
-              </span>
             </div>
           )}
 
           {/* 2. Timeout toast when timer has run out */}
-          {showTimeoutAlert && (
-            <div className="fixed left-1/2 top-5 z-55 flex w-[360px] -translate-x-1/2 items-center gap-3 rounded-full bg-white px-4 py-2.5 shadow-xl border border-red-100 font-sans animate-in fade-in slide-in-from-top-4 duration-300 select-none">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EF4444] text-white shadow-xs">
-                <div className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[#EF4444]">
-                  <X className="h-2.5 w-2.5 stroke-[3]" />
-                </div>
-              </div>
-              <span className="text-sm font-normal text-neutral-800">
-                Đã quá thời gian thanh toán, thử lại
-              </span>
-              <button
-                onClick={() => {
-                  setShowTimeoutAlert(false);
-                  setTimeLeft(10); // reset/refresh timer
-                }}
-                className="ml-auto text-neutral-400 hover:text-neutral-600 cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
+          <CustomToast
+            show={showTimeoutAlert}
+            type="error"
+            message="Đã quá thời gian thanh toán, thử lại"
+            onClose={() => {
+              setShowTimeoutAlert(false);
+              setTimeLeft(10); // reset/refresh timer
+            }}
+          />
         </>
       )}
 
@@ -954,7 +946,7 @@ export function PaymentView({
 
             <div className="grid grid-cols-2 gap-4">
               <button
-                onClick={handleReturnHome}
+                onClick={() => alert("Tính năng lịch sử thanh toán đang được phát triển!")}
                 className="py-3 rounded-xl border border-neutral-200 hover:bg-neutral-50 transition-colors font-medium text-sm text-neutral-700 cursor-pointer"
               >
                 Xem lịch sử
