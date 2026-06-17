@@ -302,6 +302,12 @@ const SERVICES_OPTIONS = [
     name: "Gói chuyên sâu",
     price: 320000,
     description: "Lộ trình tập + Dinh dưỡng + Kiểm tra sức khỏe + Theo dõi tuần."
+  },
+  {
+    id: "khong",
+    name: "Không thêm dịch vụ nào",
+    price: 0,
+    description: "Chỉ tập cùng huấn luyện viên theo giờ."
   }
 ];
 
